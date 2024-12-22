@@ -1,4 +1,6 @@
 from defs import *
+import logger
+import random
 
 __pragma__('noalias', 'name')
 __pragma__('noalias', 'undefined')
@@ -10,10 +12,22 @@ __pragma__('noalias', 'type')
 __pragma__('noalias', 'update')
 
 
-def run_harvester(creep):
+def create_harvester(name: str, spawn: StructureSpawn, components: list, memory: dict = None):
     """
-    Runs a creep as a generic harvester.
-    :param creep: The creep to run
+        Create a harvester creep.
+    """
+    logger.info("Creating harvester: " + name + ".")
+    if memory:
+        memory.update({'role': 'harvester'})
+    else:
+        memory = {'role': 'harvester'}
+    res = spawn.createCreep(components, name, memory)
+    return res
+
+
+def run_harvester(creep: Creep):
+    """
+        Run the harvester creep.
     """
 
     # If we're full, stop filling up and remove the saved source

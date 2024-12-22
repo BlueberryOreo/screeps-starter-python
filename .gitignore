@@ -118,3 +118,7 @@ coverage.xml
 /config.json
 /git-cloned/
 /markdown/
+
+# Vscode #
+##########
+.vscode/
