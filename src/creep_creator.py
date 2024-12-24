@@ -3,6 +3,8 @@ from datetime import datetime
 
 import logger
 from harvester_controller import create_harvester
+from upgrader_controller import create_upgrader
+from builder_controller import create_builder
 
 __pragma__('noalias', 'name')
 __pragma__('noalias', 'undefined')
@@ -32,12 +34,15 @@ def create_creep(role: str, spawn: StructureSpawn, components: list, memory: dic
     """
         Create a creep.
     """
+    time = str(Game.time)
     if role == ROLE_HARVESTER:
-        # time = datetime.now().strftime("%Y%m%d%H%M%S")
-        time = str(Game.time)
         return create_harvester(ROLE_HARVESTER + time, spawn, components, memory)
+    elif role == ROLE_UPGRADER:
+        return create_upgrader(ROLE_UPGRADER + time, spawn, components, memory)
+    elif role == ROLE_BUILDER:
+        return create_builder(ROLE_BUILDER + time, spawn, components, memory)
     else:
-        logger.warning(f"Unimplemented role {role}.")
+        logger.warning("Unimplemented role {}.".format(role))
         return None
 
 def create_rnd_role():

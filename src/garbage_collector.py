@@ -19,6 +19,6 @@ def collect_garbage():
     for name in Object.keys(memory):
         # logger.debug(name, Game.creeps[name])
         if not Game.creeps[name]:
-            logger.info(f"Removed dead creep {name} from memory.")
+            logger.info("Removed dead creep " + name + " from memory.")
             del memory[name]
     
