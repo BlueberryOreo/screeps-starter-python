@@ -19,12 +19,16 @@ S_REPAIR = "repair"
 S_UPGRADE = "upgrade"
 S_ATTACK = "attack"
 S_FINDINGWAY = "findingway"
+S_WANDERING = "wandering"
+S_MOVE_TO_FLAG = "move_to_flag"
+S_FIND_AND_ATTACK = "find_and_attack"
 S_DEAD = "dead"
 
 ROLE_HARVESTER = 'harvester'
 ROLE_UPGRADER = 'upgrader'
 ROLE_BUILDER = 'builder'
 ROLE_REPAIRER = 'repairer'
+ROLE_ATTACKER = 'attacker'
 ROLE_WALL_REPAIRER = 'wall_repairer'
 
 ROLES = [
@@ -32,7 +36,8 @@ ROLES = [
     ROLE_UPGRADER, 
     ROLE_BUILDER, 
     ROLE_REPAIRER, 
-    ROLE_WALL_REPAIRER
+    ROLE_WALL_REPAIRER,
+    ROLE_ATTACKER
 ]
 
 COMPONENT_COSTS = {

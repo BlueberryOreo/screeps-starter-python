@@ -8,10 +8,12 @@ from creep_creator import *
 from harvester_controller import run_harvester
 from upgrader_controller import run_upgrader
 from builder_controller import run_builder
+from attacker_controller import run_attacker
 
 import logger
 from utils import *
 from status import *
+from creeps_design import *
 
 # These are currently required for Transcrypt in order to use the following names in JavaScript.
 # Without the 'noalias' pragma, each of the following would be translated into something like 'py_Infinity' or
@@ -43,6 +45,8 @@ def main():
             run_upgrader(creep)
         elif creep.memory.role == ROLE_BUILDER:
             run_builder(creep)
+        elif creep.memory.role == ROLE_ATTACKER:
+            run_attacker(creep)
         # elif creep.memory.role == ROLE_REPAIRER:
         #     run_repairer(creep)
         # elif creep.memory.role == ROLE_WALL_REPAIRER:
@@ -56,13 +60,14 @@ def main():
             num_creeps = count_creeps(spawn)
 
             # If there are no creeps, spawn a creep once energy is at 250 or more
-            if num_creeps[ROLE_HARVESTER] < 5 and spawn.room.energyAvailable >= 250:
-                create_creep(ROLE_HARVESTER, spawn, [WORK, CARRY, MOVE, MOVE])
+            if num_creeps[ROLE_HARVESTER] < 3 and spawn.room.energyAvailable >= 250:
+                create_creep(ROLE_HARVESTER, spawn, BASE_HARVESTER)
             elif num_creeps[ROLE_UPGRADER] < 3 and spawn.room.energyAvailable >= 250:
-                create_creep(ROLE_UPGRADER, spawn, [WORK, CARRY, MOVE, MOVE])
+                create_creep(ROLE_UPGRADER, spawn, BASE_UPGRADER)
             
-            if num_creeps[ROLE_BUILDER] < 4 and spawn.room.energyAvailable >= 250:
-                create_creep(ROLE_BUILDER, spawn, [WORK, CARRY, MOVE, MOVE])
-
+            elif num_creeps[ROLE_BUILDER] < 4 and spawn.room.energyAvailable >= 250:
+                create_creep(ROLE_BUILDER, spawn, BASE_BUILDER)
+            elif num_creeps[ROLE_ATTACKER] < 5 and spawn.room.energyAvailable >= 300:
+                create_creep(ROLE_ATTACKER, spawn, RANGED_ATTACKER)
 
 module.exports.loop = main

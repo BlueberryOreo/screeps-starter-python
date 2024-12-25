@@ -4,6 +4,7 @@ import logger
 from harvester_controller import create_harvester
 from upgrader_controller import create_upgrader
 from builder_controller import create_builder
+from attacker_controller import create_attacker
 
 from status import *
 
@@ -38,6 +39,8 @@ def create_creep(role: str, spawn: StructureSpawn, components: list, memory: dic
         return create_upgrader(ROLE_UPGRADER + time, spawn, components, memory)
     elif role == ROLE_BUILDER:
         return create_builder(ROLE_BUILDER + time, spawn, components, memory)
+    elif role == ROLE_ATTACKER:
+        return create_attacker(ROLE_ATTACKER + time, spawn, components, memory)
     else:
         logger.warning("Unimplemented role {}.".format(role))
         return None
