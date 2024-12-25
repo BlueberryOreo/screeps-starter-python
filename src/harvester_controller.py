@@ -1,6 +1,7 @@
 from defs import *
 import logger
-import random
+
+from status import *
 
 __pragma__('noalias', 'name')
 __pragma__('noalias', 'undefined')
@@ -17,10 +18,12 @@ def create_harvester(name: str, spawn: StructureSpawn, components: list, memory:
         Create a harvester creep.
     """
     logger.info("Creating harvester: " + name + ".")
-    if memory:
-        memory.update({'role': 'harvester'})
+    if memory is not None:
+        memory.role = ROLE_HARVESTER
     else:
-        memory = {'role': 'harvester'}
+        memory = {'role': ROLE_HARVESTER}
+    
+    logger.info("memory: {}".format(memory))
     res = spawn.createCreep(components, name, memory)
     return res
 
@@ -30,43 +33,68 @@ def run_harvester(creep: Creep):
         Run the harvester creep.
     """
 
-    # If we're full, stop filling up and remove the saved source
-    if creep.memory.filling and creep.store.getFreeCapacity() <= 0:
-        creep.memory.filling = False
-        del creep.memory.source
-    # If we're empty, start filling again and remove the saved target
-    elif not creep.memory.filling and creep.carry.energy <= 0:
-        creep.memory.filling = True
-        del creep.memory.target
+    if creep.memory.status == S_IDEL:
+        if creep.spawning:
+            return
+        creep.memory.status = S_FINDINGWAY
+        return
 
-    if creep.memory.filling:
-        # If we have a saved source, use it
-        if creep.memory.source:
-            source = Game.getObjectById(creep.memory.source)
-        else:
-            # Get a random new source and save it
+    if creep.memory.status == S_FINDINGWAY:
+        if not creep.memory.path_to or not creep.memory.path_back:
             source = _.sample(creep.room.find(FIND_SOURCES))
-            creep.memory.source = source.id
+            spawn = _.sample(creep.room.find(FIND_MY_SPAWNS))
 
-        # If we're near the source, harvest it - otherwise, move to it.
-        if creep.pos.isNearTo(source):
-            result = creep.harvest(source)
-            if result != OK:
-                logger.warning("[{}] Unknown result from creep.harvest({}): {}".format(creep.name, source, result))
-        else:
-            creep.moveTo(source)
-    else:
-        if creep.memory.target:
-            target = Game.getObjectById(creep.memory.target)
-        else:
-            # Get a random new target and save it
-            target = _.sample(creep.room.find(FIND_MY_SPAWNS))
-            creep.memory.target = target.id
+            path_to = creep.room.findPath(spawn.pos, source.pos, {"range": 1})
+            start = path_to[path_to.length - 1]
+            goal = path_to[0]
+            path_back = creep.room.findPath(__new__(RoomPosition(start.x, start.y, creep.room.name)),
+                                            __new__(RoomPosition(goal.x, goal.y, creep.room.name)))
+            creep.memory.start = path_to[0]
+            creep.memory.path_to = Room.serializePath(path_to)
+            creep.memory.path_back = Room.serializePath(path_back)
+            # creep.memory.path_to = path_to
+            # creep.memory.path_back = path_back
+
+            creep.memory.source_id = source.id
+            creep.memory.target_id = spawn.id
         
-        # If we're near the target, transfer energy to it - otherwise, move to it.
-        if creep.pos.isNearTo(target):
-            result = creep.transfer(target, RESOURCE_ENERGY)
-            if result != OK:
-                logger.warning("[{}] Unknown result from creep.transfer({}): {}".format(creep.name, target, result))
+        if creep.pos.isEqualTo(creep.memory.start.x, creep.memory.start.y):
+            creep.memory.status = S_MOVE
+            del creep.memory.start
+            return
+        creep.moveTo(creep.memory.start.x, creep.memory.start.y)
+        return
+
+    if creep.memory.status == S_MOVE:
+        if creep.store.getFreeCapacity() > 0:
+            target = Game.getObjectById(creep.memory.source_id)
+            path = creep.memory.path_to
+            next_status = S_WORK
         else:
-            creep.moveTo(target)
+            target = Game.getObjectById(creep.memory.target_id)
+            path = creep.memory.path_back
+            next_status = S_TRANSFER
+        
+        creep.moveByPath(path)
+        if creep.pos.isNearTo(target):
+            creep.memory.status = next_status
+        return
+    
+    if creep.memory.status == S_WORK:
+        source = Game.getObjectById(creep.memory.source_id)
+        result = creep.harvest(source)
+        if result != OK:
+            logger.warning("[{}] Unknown result from creep.harvest({}): {}".format(creep.name, source, result))
+        if creep.store.getFreeCapacity() <= 0:
+            creep.memory.status = S_MOVE
+        return
+    
+    if creep.memory.status == S_TRANSFER:
+        target = Game.getObjectById(creep.memory.target_id)
+        result = creep.transfer(target, RESOURCE_ENERGY)
+        if result != OK:
+            logger.warning("[{}] Unknown result from creep.transfer({}): {}".format(creep.name, target, result))
+        if creep.store.getUsedCapacity() <= 0:
+            creep.memory.status = S_MOVE
+        return
+

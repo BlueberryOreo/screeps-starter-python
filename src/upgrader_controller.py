@@ -1,6 +1,5 @@
 from defs import *
 import logger
-import random
 
 __pragma__('noalias', 'name')
 __pragma__('noalias', 'undefined')
@@ -18,7 +17,7 @@ def create_upgrader(name: str, spawn: StructureSpawn, components: list, memory: 
     """
     logger.info("Creating upgrader: " + name + ".")
     if memory:
-        memory.update({'role': 'upgrader'})
+        memory.role = 'upgrader'
     else:
         memory = {'role': 'upgrader'}
     res = spawn.createCreep(components, name, memory)

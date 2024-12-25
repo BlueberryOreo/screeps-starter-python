@@ -1,6 +1,5 @@
 from defs import *
 import logger
-import random
 
 __pragma__('noalias', 'name')
 __pragma__('noalias', 'undefined')
@@ -17,9 +16,10 @@ def create_builder(name: str, spawn: StructureSpawn, components: list, memory: d
     """
     logger.info("Creating builder: " + name + ".")
     if memory:
-        memory.update({'role': 'builder'})
+        memory['role'] = 'builder'
     else:
         memory = {'role': 'builder'}
+    
     res = spawn.createCreep(components, name, memory)
     return res
 

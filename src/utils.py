@@ -1,6 +1,6 @@
 from defs import *
 
-from creep_creator import ROLES
+from status import ROLES
 
 __pragma__('noalias', 'name')
 __pragma__('noalias', 'undefined')

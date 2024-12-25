@@ -1,10 +1,11 @@
 from defs import *
-from datetime import datetime
 
 import logger
 from harvester_controller import create_harvester
 from upgrader_controller import create_upgrader
 from builder_controller import create_builder
+
+from status import *
 
 __pragma__('noalias', 'name')
 __pragma__('noalias', 'undefined')
@@ -16,25 +17,21 @@ __pragma__('noalias', 'type')
 __pragma__('noalias', 'update')
 
 
-ROLE_HARVESTER = 'harvester'
-ROLE_UPGRADER = 'upgrader'
-ROLE_BUILDER = 'builder'
-ROLE_REPAIRER = 'repairer'
-ROLE_WALL_REPAIRER = 'wall_repairer'
-
-ROLES = [
-    ROLE_HARVESTER, 
-    ROLE_UPGRADER, 
-    ROLE_BUILDER, 
-    ROLE_REPAIRER, 
-    ROLE_WALL_REPAIRER
-]
-
 def create_creep(role: str, spawn: StructureSpawn, components: list, memory: dict):
     """
         Create a creep.
     """
     time = str(Game.time)
+    total_cost = _.sum(components, lambda c: COMPONENT_COSTS[c])
+    if total_cost > spawn.room.energyAvailable:
+        logger.info("Not enough energy to create creep: {} > {}.".format(total_cost, spawn.room.energyAvailable))
+        return None
+    
+    if memory:
+        memory["status"] = S_IDEL
+    else:
+        memory = {"status": S_IDEL}
+    
     if role == ROLE_HARVESTER:
         return create_harvester(ROLE_HARVESTER + time, spawn, components, memory)
     elif role == ROLE_UPGRADER:
