@@ -39,10 +39,10 @@ def main():
         creep = Game.creeps[name]
         if creep.memory.role == ROLE_HARVESTER:
             run_harvester(creep)
-        # elif creep.memory.role == ROLE_UPGRADER:
-        #     run_upgrader(creep)
-        # elif creep.memory.role == ROLE_BUILDER:
-        #     run_builder(creep)
+        elif creep.memory.role == ROLE_UPGRADER:
+            run_upgrader(creep)
+        elif creep.memory.role == ROLE_BUILDER:
+            run_builder(creep)
         # elif creep.memory.role == ROLE_REPAIRER:
         #     run_repairer(creep)
         # elif creep.memory.role == ROLE_WALL_REPAIRER:
@@ -56,13 +56,13 @@ def main():
             num_creeps = count_creeps(spawn)
 
             # If there are no creeps, spawn a creep once energy is at 250 or more
-            if num_creeps[ROLE_HARVESTER] < 10 and spawn.room.energyAvailable >= 250:
+            if num_creeps[ROLE_HARVESTER] < 5 and spawn.room.energyAvailable >= 250:
                 create_creep(ROLE_HARVESTER, spawn, [WORK, CARRY, MOVE, MOVE])
-            # elif num_creeps[ROLE_UPGRADER] < 2 and spawn.room.energyAvailable >= 250:
-            #     create_creep(ROLE_UPGRADER, spawn, [WORK, CARRY, MOVE, MOVE])
+            elif num_creeps[ROLE_UPGRADER] < 3 and spawn.room.energyAvailable >= 250:
+                create_creep(ROLE_UPGRADER, spawn, [WORK, CARRY, MOVE, MOVE])
             
-            # if spawn.room.energyAvailable >= 300 and spawn.room.controller.level >= 2 and num_creeps[ROLE_BUILDER] < 4:
-            #     create_creep(ROLE_BUILDER, spawn, [WORK, CARRY, MOVE, MOVE])
+            if num_creeps[ROLE_BUILDER] < 4 and spawn.room.energyAvailable >= 250:
+                create_creep(ROLE_BUILDER, spawn, [WORK, CARRY, MOVE, MOVE])
 
 
 module.exports.loop = main

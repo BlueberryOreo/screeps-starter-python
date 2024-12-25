@@ -44,7 +44,7 @@ def run_harvester(creep: Creep):
             source = _.sample(creep.room.find(FIND_SOURCES))
             spawn = _.sample(creep.room.find(FIND_MY_SPAWNS))
 
-            path_to = creep.room.findPath(spawn.pos, source.pos, {"range": 1})
+            path_to = creep.room.findPath(spawn.pos, source.pos)
             start = path_to[path_to.length - 1]
             goal = path_to[0]
             path_back = creep.room.findPath(__new__(RoomPosition(start.x, start.y, creep.room.name)),
@@ -75,10 +75,18 @@ def run_harvester(creep: Creep):
             path = creep.memory.path_back
             next_status = S_TRANSFER
         
-        creep.moveByPath(path)
+        res = creep.moveByPath(path)
         if creep.pos.isNearTo(target):
             creep.memory.status = next_status
-        return
+            return
+        
+        if res != OK and res != ERR_TIRED:
+            logger.warning("[{}] Unknown result from creep.moveByPath({}): {}".format(creep.name, path, res))
+            logger.info("[{}] Resetting path.".format(creep.name))
+            del creep.memory.path_to
+            del creep.memory.path_back
+            creep.memory.status = S_FINDINGWAY
+            return
     
     if creep.memory.status == S_WORK:
         source = Game.getObjectById(creep.memory.source_id)

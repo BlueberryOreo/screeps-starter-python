@@ -1,6 +1,8 @@
 from defs import *
 import logger
 
+from status import *
+
 __pragma__('noalias', 'name')
 __pragma__('noalias', 'undefined')
 __pragma__('noalias', 'Infinity')
@@ -27,44 +29,79 @@ def run_upgrader(creep: Creep):
     """
         Run the upgrader creep.
     """
-    # If we're empty, stop upgrading and remove the saved source
-    if creep.memory.upgrading and creep.carry.energy <= 0:
-        creep.memory.upgrading = False
-        del creep.memory.controller
-    # If we're full, stop filling and remove the saved target
-    elif not creep.memory.upgrading and creep.store.getFreeCapacity() <= 0:
-        creep.memory.upgrading = True
-        del creep.memory.target
+    if creep.memory.status == S_IDEL:
+        if creep.spawning:
+            return
+        creep.memory.status = S_FINDINGWAY
+        return
     
-    if creep.memory.upgrading:
-        # If we have a saved controller, use it
-        if creep.memory.controller:
-            controller = Game.getObjectById(creep.memory.controller)
-        else:
-            # Get a random new controller and save it
+    if creep.memory.status == S_FINDINGWAY:
+        if not creep.memory.path_to or not creep.memory.path_back:
+            source = _.sample(creep.room.find(FIND_SOURCES))
             controller = creep.room.controller
-            creep.memory.controller = controller.id
+
+            path_to = creep.room.findPath(controller.pos, source.pos)
+            start = path_to[path_to.length - 1]
+            goal = path_to[0]
+            path_back = creep.room.findPath(__new__(RoomPosition(start.x, start.y, creep.room.name)),
+                                            __new__(RoomPosition(goal.x, goal.y, creep.room.name)))
+            creep.memory.start = path_to[0]
+            creep.memory.path_to = Room.serializePath(path_to)
+            creep.memory.path_back = Room.serializePath(path_back)
+            # creep.memory.path_to = path_to
+            # creep.memory.path_back = path_back
+
+            creep.memory.source_id = source.id
         
-        # If we're near the controller, upgrade it - otherwise, move to it.
-        if creep.pos.inRangeTo(controller, 3):
-            result = creep.upgradeController(controller)
-            if result != OK:
-                logger.warning("[{}] Unknown result from creep.upgradeController({}): {}".format(creep.name, controller, result))
+        if creep.pos.isEqualTo(creep.memory.start.x, creep.memory.start.y):
+            creep.memory.status = S_MOVE
+            del creep.memory.start
+            return
+        creep.moveTo(creep.memory.start.x, creep.memory.start.y)
+        return
+
+    if creep.memory.status == S_MOVE:
+        if creep.store.getFreeCapacity() > 0:
+            target = Game.getObjectById(creep.memory.source_id)
+            path = creep.memory.path_to
+            next_status = S_WORK
         else:
-            creep.moveTo(controller)
-    else:
-        # If we have a saved target, use it
-        if creep.memory.target:
-            target = Game.getObjectById(creep.memory.target)
-        else:
-            # Get a random new target and save it
-            target = _.sample(creep.room.find(FIND_SOURCES))
-            creep.memory.target = target.id
+            target = creep.room.controller
+            path = creep.memory.path_back
+            next_status = S_UPGRADE
         
-        # If we're near the target, harvest it - otherwise, move to it.
-        if creep.pos.isNearTo(target):
-            result = creep.harvest(target)
-            if result != OK:
-                logger.warning("[{}] Unknown result from creep.harvest({}): {}".format(creep.name, target, result))
+        res = creep.moveByPath(path)
+        if next_status == S_WORK:
+            if creep.pos.isNearTo(target):
+                creep.memory.status = next_status
+                return
         else:
-            creep.moveTo(target)
+            if creep.pos.inRangeTo(target, 3):
+                creep.memory.status = next_status
+                return
+            
+        if res != OK and res != ERR_TIRED:
+            logger.warning("[{}] Unknown result from creep.moveByPath({}): {}".format(creep.name, path, res))
+            logger.info("[{}] Resetting path.".format(creep.name))
+            del creep.memory.path_to
+            del creep.memory.path_back
+            creep.memory.status = S_FINDINGWAY
+            return
+    
+    if creep.memory.status == S_WORK:
+        source = Game.getObjectById(creep.memory.source_id)
+        result = creep.harvest(source)
+        if result != OK:
+            logger.warning("[{}] Unknown result from creep.harvest({}): {}".format(creep.name, source, result))
+        if creep.store.getFreeCapacity() <= 0:
+            creep.memory.status = S_MOVE
+        return
+    
+    if creep.memory.status == S_UPGRADE:
+        target = creep.room.controller
+        result = creep.upgradeController(target)
+        if result != OK:
+            logger.warning("[{}] Unknown result from creep.transfer({}): {}".format(creep.name, target, result))
+        if creep.store.getUsedCapacity() <= 0:
+            creep.memory.status = S_MOVE
+        return
