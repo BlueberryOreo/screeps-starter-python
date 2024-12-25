@@ -1,5 +1,4 @@
 from defs import *
-from datetime import datetime
 
 import logger
 from harvester_controller import create_harvester

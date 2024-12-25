@@ -1,6 +1,5 @@
 from defs import *
 import logger
-import random
 
 __pragma__('noalias', 'name')
 __pragma__('noalias', 'undefined')
