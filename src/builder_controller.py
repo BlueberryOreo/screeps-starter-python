@@ -46,6 +46,7 @@ def run_builder(creep: Creep):
             goal = path_to[0]
             path_back = creep.room.findPath(__new__(RoomPosition(start.x, start.y, creep.room.name)),
                                             __new__(RoomPosition(goal.x, goal.y, creep.room.name)))
+            creep.memory.start = path_to[0]
             creep.memory.path_to = Room.serializePath(path_to)
             creep.memory.path_back = Room.serializePath(path_back)
             # creep.memory.path_to = path_to
@@ -71,6 +72,8 @@ def run_builder(creep: Creep):
             path = creep.memory.path_back
             next_status = S_BUILD
         
+        # last_pos = creep.pos
+        
         res = creep.moveByPath(path)
         if creep.pos.isNearTo(target):
             creep.memory.status = next_status
@@ -83,6 +86,17 @@ def run_builder(creep: Creep):
             del creep.memory.path_back
             creep.memory.status = S_FINDINGWAY
             return
+        
+        # TODO: Avoid the creep in the path.
+        # if last_pos.isEqualTo(creep.pos):
+        #     if creep.memory.waiting:
+        #         creep.memory.waiting += 1
+        #     else:
+        #         creep.memory.waiting = 1
+            
+        #     if creep.memory.waiting > 5:
+        #         logger.info("[{}] Crash, try to avoid the creep in the path.".format(creep.name))
+                
     
     if creep.memory.status == S_WORK:
         source = Game.getObjectById(creep.memory.source_id)
