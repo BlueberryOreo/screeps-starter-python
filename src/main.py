@@ -65,9 +65,9 @@ def main():
             elif num_creeps[ROLE_UPGRADER] < 3 and spawn.room.energyAvailable >= 250:
                 create_creep(ROLE_UPGRADER, spawn, BASE_UPGRADER)
             
-            elif num_creeps[ROLE_BUILDER] < 4 and spawn.room.energyAvailable >= 250:
+            elif num_creeps[ROLE_BUILDER] < 6 and spawn.room.energyAvailable >= 250:
                 create_creep(ROLE_BUILDER, spawn, BASE_BUILDER)
-            elif num_creeps[ROLE_ATTACKER] < 5 and spawn.room.energyAvailable >= 300:
-                create_creep(ROLE_ATTACKER, spawn, RANGED_ATTACKER)
+            # elif num_creeps[ROLE_ATTACKER] < 5 and spawn.room.energyAvailable >= 300:
+            #     create_creep(ROLE_ATTACKER, spawn, RANGED_ATTACKER)
 
 module.exports.loop = main
