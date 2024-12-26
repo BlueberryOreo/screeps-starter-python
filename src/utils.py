@@ -11,6 +11,9 @@ __pragma__('noalias', 'set')
 __pragma__('noalias', 'type')
 __pragma__('noalias', 'update')
 
+dx = [0, 1, 0, -1, 1, 1, -1, -1]
+dy = [-1, 0, 1, 0, -1, 1, 1, -1]
+
 
 def count_creeps(spawn: StructureSpawn, role: str = None):
     """
@@ -26,3 +29,15 @@ def count_creeps(spawn: StructureSpawn, role: str = None):
             k: _.sum(Game.creeps, lambda c: c.pos.roomName == spawn.pos.roomName and c.memory.role == k) for k in ROLES
         }
     return res
+
+def get_source_pos(source: Source):
+    source_pos = source.pos
+    for i in range(8):
+        tmp = __new__(RoomPosition(source_pos.x + dx[i], source_pos.y + dy[i], source_pos.roomName))
+        if source.room.getTerrain().get(tmp.x, tmp.y) != TERRAIN_MASK_WALL:
+            source_pos = tmp
+            for creep in source.room.find(FIND_MY_CREEPS):
+                if creep.pos.isEqualTo(tmp):
+                    continue
+            break
+    return source_pos

@@ -13,9 +13,6 @@ __pragma__('noalias', 'set')
 __pragma__('noalias', 'type')
 __pragma__('noalias', 'update')
 
-dx = [0, 1, 0, -1, 1, 1, -1, -1]
-dy = [-1, 0, 1, 0, -1, 1, 1, -1]
-
 def work(creep: Creep):
     """
         Work.

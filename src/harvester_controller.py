@@ -5,6 +5,7 @@ from status import *
 from creeps_design import *
 
 from controller import *
+from utils import get_source_pos
 
 __pragma__('noalias', 'name')
 __pragma__('noalias', 'undefined')
@@ -55,12 +56,7 @@ def run_harvester(creep: Creep):
                 return
 
             target = _.sample(targets)
-            source_pos = source.pos
-            for i in range(8):
-                tmp = __new__(RoomPosition(source_pos.x + dx[i], source_pos.y + dy[i], source_pos.roomName))
-                if creep.room.getTerrain().get(tmp.x, tmp.y) != TERRAIN_MASK_WALL:
-                    source_pos = tmp
-                    break
+            source_pos = get_source_pos(source)
             path_to = creep.room.findPath(target.pos, source_pos)
             start = path_to[path_to.length - 1]
             goal = path_to[0]

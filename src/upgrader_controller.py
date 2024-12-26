@@ -3,6 +3,7 @@ import logger
 
 from status import *
 from controller import *
+from utils import get_source_pos
 
 __pragma__('noalias', 'name')
 __pragma__('noalias', 'undefined')
@@ -41,12 +42,7 @@ def run_upgrader(creep: Creep):
             source = _.sample(creep.room.find(FIND_SOURCES))
             controller = creep.room.controller
 
-            source_pos = source.pos
-            for i in range(8):
-                tmp = __new__(RoomPosition(source_pos.x + dx[i], source_pos.y + dy[i], source_pos.roomName))
-                if creep.room.getTerrain().get(tmp.x, tmp.y) != TERRAIN_MASK_WALL:
-                    source_pos = tmp
-                    break
+            source_pos = get_source_pos(source)
             path_to = creep.room.findPath(controller.pos, source_pos)
             start = path_to[path_to.length - 1]
             goal = path_to[0]
