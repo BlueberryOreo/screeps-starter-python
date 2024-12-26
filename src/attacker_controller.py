@@ -47,8 +47,8 @@ def run_attacker(creep: Creep):
     
     if creep.memory.status == S_MOVE_TO_FLAG:
         flag = creep.room.find(FIND_FLAGS)[0]
-        if creep.pos.isEqualTo(flag.pos.x, flag.pos.y):
-            creep.memory.status = S_ATTACK
+        if creep.pos.inRangeTo(flag.pos.x, flag.pos.y, 5):
+            creep.memory.status = S_FIND_AND_ATTACK
             return
         creep.moveTo(flag.pos.x, flag.pos.y)
         return
@@ -69,29 +69,29 @@ def run_attacker(creep: Creep):
             creep.moveTo(target)
         return
     
-    if creep.memory.status == S_MOVE_TO_FLAG:
-        flag = creep.room.find(FIND_FLAGS)[0]
-        if not flag:
-            creep.memory.status = S_WANDERING
-            return
+    # if creep.memory.status == S_MOVE_TO_FLAG:
+    #     flag = creep.room.find(FIND_FLAGS)[0]
+    #     if not flag:
+    #         creep.memory.status = S_WANDERING
+    #         return
         
-        if creep.pos.inRangeTo(flag.pos.x, flag.pos.y, 5):
-            creep.memory.status = S_ATTACK
-            return
-        creep.moveTo(flag.pos.x, flag.pos.y)
-        return
+    #     if creep.pos.inRangeTo(flag.pos.x, flag.pos.y, 5):
+    #         creep.memory.status = S_FIND_AND_ATTACK
+    #         return
+    #     creep.moveTo(flag.pos.x, flag.pos.y)
+    #     return
     
-    if creep.memory.status == S_ATTACK:
-        if not creep.memory.target:
-            target = creep.pos.findInRange(FIND_HOSTILE_CREEPS, 4)
-            if target:
-                creep.memory.target = target.id
-        else:
-            target = Game.getObjectById(creep.memory.target)
+    # if creep.memory.status == S_ATTACK:
+    #     if not creep.memory.target:
+    #         target = creep.pos.findInRange(FIND_HOSTILE_CREEPS, 4)
+    #         if target:
+    #             creep.memory.target = target.id
+    #     else:
+    #         target = Game.getObjectById(creep.memory.target)
 
-        if target:
-            creep.memory.status = S_WANDERING
-            return
-        if creep.attack(target) == ERR_NOT_IN_RANGE:
-            creep.moveTo(target)
-        return
+    #     if not target:
+    #         creep.memory.status = S_WANDERING
+    #         return
+    #     if creep.attack(target) == ERR_NOT_IN_RANGE:
+    #         creep.moveTo(target)
+    #     return
