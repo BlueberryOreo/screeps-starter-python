@@ -95,7 +95,7 @@ def run_builder(creep: Creep):
     
     if creep.memory.status == S_BUILD:
         target = Game.getObjectById(creep.memory.target_id)
-        if target.progress == target.progressTotal:
+        if target is None or (target is not None and target.progress == target.progressTotal):
             creep.memory.status = S_FINDINGWAY
             del creep.memory.path_to
             del creep.memory.path_back
