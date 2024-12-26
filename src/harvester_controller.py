@@ -42,9 +42,17 @@ def run_harvester(creep: Creep):
     if creep.memory.status == S_FINDINGWAY:
         if not creep.memory.path_to or not creep.memory.path_back:
             source = _.sample(creep.room.find(FIND_SOURCES))
-            spawn = _.sample(creep.room.find(FIND_MY_SPAWNS))
+            # spawn = _.sample(creep.room.find(FIND_MY_SPAWNS))
+            targets = _.filter(creep.room.find(FIND_MY_STRUCTURES), 
+                               lambda s: (s.structureType == STRUCTURE_EXTENSION or s.structureType == STRUCTURE_SPAWN) and s.store.getFreeCapacity(RESOURCE_ENERGY) > 0)
+            if targets.length == 0:
+                logger.info("[{}] No target found.".format(creep.name))
+                creep.memory.role = _.sample([ROLE_BUILDER, ROLE_UPGRADER])
+                logger.info("[{}] Role changed to {}.".format(creep.name, creep.memory.role))
+                return
 
-            path_to = creep.room.findPath(spawn.pos, source.pos)
+            target = _.sample(targets)
+            path_to = creep.room.findPath(target.pos, source.pos)
             start = path_to[path_to.length - 1]
             goal = path_to[0]
             path_back = creep.room.findPath(__new__(RoomPosition(start.x, start.y, creep.room.name)),
@@ -56,7 +64,7 @@ def run_harvester(creep: Creep):
             # creep.memory.path_back = path_back
 
             creep.memory.source_id = source.id
-            creep.memory.target_id = spawn.id
+            creep.memory.target_id = target.id
         
         if creep.pos.isEqualTo(creep.memory.start.x, creep.memory.start.y):
             creep.memory.status = S_MOVE
@@ -66,7 +74,7 @@ def run_harvester(creep: Creep):
         return
 
     if creep.memory.status == S_MOVE:
-        if creep.store.getFreeCapacity() > 0:
+        if creep.store.getUsedCapacity() <= 0.5 * creep.store.getCapacity():
             target = Game.getObjectById(creep.memory.source_id)
             path = creep.memory.path_to
             next_status = S_WORK
@@ -102,11 +110,11 @@ def run_harvester(creep: Creep):
         result = creep.transfer(target, RESOURCE_ENERGY)
         if result == ERR_FULL:
             logger.info("[{}] Target {} is full.".format(creep.name, target.name))
-            creep.memory.role = _.sample([ROLE_UPGRADER, ROLE_BUILDER])
+            logger.info("[{}] Trying to find another target.".format(creep.name))
             creep.memory.status = S_FINDINGWAY
-            creep.memory.path_to = None
-            creep.memory.path_back = None
-            logger.info("[{}] New role: {}".format(creep.name, creep.memory.role))
+            del creep.memory.path_to
+            del creep.memory.path_back
+            del creep.memory.target_id
             return
         if result != OK:
             logger.warning("[{}] Unknown result from creep.transfer({}): {}".format(creep.name, target, result))

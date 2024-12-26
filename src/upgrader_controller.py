@@ -61,7 +61,7 @@ def run_upgrader(creep: Creep):
         return
 
     if creep.memory.status == S_MOVE:
-        if creep.store.getFreeCapacity() > 0:
+        if creep.store.getUsedCapacity() <= 0.5 * creep.store.getCapacity():
             target = Game.getObjectById(creep.memory.source_id)
             path = creep.memory.path_to
             next_status = S_WORK
