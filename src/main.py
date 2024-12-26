@@ -63,7 +63,7 @@ def main():
             if num_creeps[ROLE_HARVESTER] < 5 and spawn.room.energyAvailable >= 250:
                 create_creep(ROLE_HARVESTER, spawn, BASE_HARVESTER)
                 # create_creep(ROLE_HARVESTER, spawn, MEDIUM_HARVESTER)
-            elif num_creeps[ROLE_UPGRADER] < 3 and spawn.room.energyAvailable >= 250:
+            elif num_creeps[ROLE_UPGRADER] < 5 and spawn.room.energyAvailable >= 250:
                 create_creep(ROLE_UPGRADER, spawn, BASE_UPGRADER)
             
             elif num_creeps[ROLE_BUILDER] < 6 and spawn.room.energyAvailable >= 250:
