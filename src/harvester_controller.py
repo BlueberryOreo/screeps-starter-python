@@ -80,13 +80,13 @@ def run_harvester(creep: Creep):
             return
         # creep.moveTo(creep.memory.start.x, creep.memory.start.y)
         last_pos = creep.pos
+        creep.moveByPath(creep.memory.find_path)
         if waiting(creep, last_pos):
             del creep.memory.path_to
             del creep.memory.path_back
             del creep.memory.find_path
             creep.memory.status = S_FINDINGWAY
             return
-        creep.moveByPath(creep.memory.find_path)
         return
 
     if creep.memory.status == S_MOVE:

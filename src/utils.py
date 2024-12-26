@@ -43,7 +43,7 @@ def get_source_pos(source: Source):
             break
     return source_pos
 
-def waiting(creep: Creep, last_pos: RoomPosition, waiting_time: int = 10):
+def waiting(creep: Creep, last_pos: RoomPosition, waiting_time: int = 150):
     if creep.pos.isEqualTo(last_pos):
         if creep.memory.waiting:
             creep.memory.waiting += 1
@@ -54,4 +54,6 @@ def waiting(creep: Creep, last_pos: RoomPosition, waiting_time: int = 10):
             logger.info("[{}] Waiting for {} ticks.".format(creep.name, waiting_time))
             creep.memory.waiting = 0
             return True
+    else:
+        creep.memory.waiting = 0
     return False
