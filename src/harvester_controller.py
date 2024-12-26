@@ -100,6 +100,14 @@ def run_harvester(creep: Creep):
     if creep.memory.status == S_TRANSFER:
         target = Game.getObjectById(creep.memory.target_id)
         result = creep.transfer(target, RESOURCE_ENERGY)
+        if result == ERR_FULL:
+            logger.info("[{}] Target {} is full.".format(creep.name, target.name))
+            creep.memory.role = _.sample([ROLE_UPGRADER, ROLE_BUILDER])
+            creep.memory.status = S_FINDINGWAY
+            creep.memory.path_to = None
+            creep.memory.path_back = None
+            logger.info("[{}] New role: {}".format(creep.name, creep.memory.role))
+            return
         if result != OK:
             logger.warning("[{}] Unknown result from creep.transfer({}): {}".format(creep.name, target, result))
         if creep.store.getUsedCapacity() <= 0:
