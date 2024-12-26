@@ -38,7 +38,8 @@ def run_builder(creep: Creep):
     if creep.memory.status == S_FINDINGWAY:
         if not creep.memory.path_to or not creep.memory.path_back:
             source = _.sample(creep.room.find(FIND_SOURCES))
-            target = _.sample(creep.room.find(FIND_CONSTRUCTION_SITES))
+            target = creep.room.find(FIND_CONSTRUCTION_SITES)
+            target = _.sortBy(target, lambda t: -t.progress)[0] # Find the construction site with the most progress.
 
             path_to = creep.room.findPath(target.pos, source.pos)
             # path_to = creep.room.findPath(source.pos, target.pos)
