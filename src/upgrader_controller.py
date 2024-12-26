@@ -3,7 +3,7 @@ import logger
 
 from status import *
 from controller import *
-from utils import get_source_pos
+from utils import *
 
 __pragma__('noalias', 'name')
 __pragma__('noalias', 'undefined')
@@ -48,8 +48,8 @@ def run_upgrader(creep: Creep):
             goal = path_to[0]
             path_back = creep.room.findPath(__new__(RoomPosition(start.x, start.y, creep.room.name)),
                                             __new__(RoomPosition(goal.x, goal.y, creep.room.name)))
-            find_path = creep.room.findPath(creep.pos, __new__(RoomPosition(start.x, start.y, creep.room.name)))
-            creep.memory.start = start
+            find_path = creep.room.findPath(creep.pos, __new__(RoomPosition(goal.x, goal.y, creep.room.name)))
+            creep.memory.start = goal
             creep.memory.find_path = Room.serializePath(find_path)
             creep.memory.path_to = Room.serializePath(path_to)
             creep.memory.path_back = Room.serializePath(path_back)
@@ -64,7 +64,13 @@ def run_upgrader(creep: Creep):
             del creep.memory.start
             return
         # creep.moveTo(creep.memory.start.x, creep.memory.start.y)
+        last_pos = creep.pos
         creep.moveByPath(creep.memory.find_path)
+        if waiting(creep, last_pos):
+            del creep.memory.path_to
+            del creep.memory.path_back
+            del creep.memory.find_path
+            creep.memory.status = S_FINDINGWAY
         return
 
     if creep.memory.status == S_MOVE:

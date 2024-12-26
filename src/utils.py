@@ -1,6 +1,7 @@
 from defs import *
 
 from creeps_design import ROLES
+import logger
 
 __pragma__('noalias', 'name')
 __pragma__('noalias', 'undefined')
@@ -41,3 +42,16 @@ def get_source_pos(source: Source):
                     continue
             break
     return source_pos
+
+def waiting(creep: Creep, last_pos: RoomPosition, waiting_time: int = 10):
+    if creep.pos.isEqualTo(last_pos):
+        if creep.memory.waiting:
+            creep.memory.waiting += 1
+        else:
+            creep.memory.waiting = 1
+        
+        if creep.memory.waiting > waiting_time:
+            logger.info("[{}] Waiting for {} ticks.".format(creep.name, waiting_time))
+            creep.memory.waiting = 0
+            return True
+    return False

@@ -3,6 +3,7 @@ import logger
 
 from status import *
 from creeps_design import *
+from utils import *
 
 __pragma__('noalias', 'name')
 __pragma__('noalias', 'undefined')
@@ -64,6 +65,7 @@ def worker_move(creep: Creep):
             logger.warning("Unknown role: {}.".format(creep.memory.role))
             return S_IDEL
     
+    last_pos = creep.pos
     res = creep.moveByPath(path)
     # logger.info("[{}] Moving to {}, res {}.".format(creep.name, target, res))
     if next_status == S_WORK:
@@ -84,4 +86,8 @@ def worker_move(creep: Creep):
         del creep.memory.path_back
         return S_FINDINGWAY
     
+    if waiting(creep, last_pos):
+        del creep.memory.path_to
+        del creep.memory.path_back
+        return S_FINDINGWAY
     return S_MOVE
