@@ -2,6 +2,9 @@ from defs import *
 import logger
 
 from status import *
+from creeps_design import *
+
+from controller import *
 
 __pragma__('noalias', 'name')
 __pragma__('noalias', 'undefined')
@@ -52,12 +55,20 @@ def run_harvester(creep: Creep):
                 return
 
             target = _.sample(targets)
-            path_to = creep.room.findPath(target.pos, source.pos)
+            source_pos = source.pos
+            for i in range(8):
+                tmp = __new__(RoomPosition(source_pos.x + dx[i], source_pos.y + dy[i], source_pos.roomName))
+                if creep.room.getTerrain().get(tmp.x, tmp.y) != TERRAIN_MASK_WALL:
+                    source_pos = tmp
+                    break
+            path_to = creep.room.findPath(target.pos, source_pos)
             start = path_to[path_to.length - 1]
             goal = path_to[0]
             path_back = creep.room.findPath(__new__(RoomPosition(start.x, start.y, creep.room.name)),
                                             __new__(RoomPosition(goal.x, goal.y, creep.room.name)))
-            creep.memory.start = path_to[0]
+            find_path = creep.room.findPath(creep.pos, __new__(RoomPosition(start.x, start.y, creep.room.name)))
+            creep.memory.start = start
+            creep.memory.find_path = Room.serializePath(find_path)
             creep.memory.path_to = Room.serializePath(path_to)
             creep.memory.path_back = Room.serializePath(path_back)
             # creep.memory.path_to = path_to
@@ -68,42 +79,50 @@ def run_harvester(creep: Creep):
         
         if creep.pos.isEqualTo(creep.memory.start.x, creep.memory.start.y):
             creep.memory.status = S_MOVE
+            del creep.memory.find_path
             del creep.memory.start
             return
-        creep.moveTo(creep.memory.start.x, creep.memory.start.y)
+        # creep.moveTo(creep.memory.start.x, creep.memory.start.y)
+        creep.moveByPath(creep.memory.find_path)
         return
 
     if creep.memory.status == S_MOVE:
-        if creep.store.getUsedCapacity() <= 0.5 * creep.store.getCapacity():
-            target = Game.getObjectById(creep.memory.source_id)
-            path = creep.memory.path_to
-            next_status = S_WORK
-        else:
-            target = Game.getObjectById(creep.memory.target_id)
-            path = creep.memory.path_back
-            next_status = S_TRANSFER
+        creep.memory.status = worker_move(creep)
+        # logger.info("[{}] Status changed to {}.".format(creep.name, creep.memory.status))
+        return
+        # if creep.store.getUsedCapacity() <= 0.5 * creep.store.getCapacity():
+        #     target = Game.getObjectById(creep.memory.source_id)
+        #     path = creep.memory.path_to
+        #     next_status = S_WORK
+        # else:
+        #     target = Game.getObjectById(creep.memory.target_id)
+        #     path = creep.memory.path_back
+        #     next_status = S_TRANSFER
         
-        res = creep.moveByPath(path)
-        if creep.pos.isNearTo(target):
-            creep.memory.status = next_status
-            return
+        # res = creep.moveByPath(path)
+        # if creep.pos.isNearTo(target):
+        #     creep.memory.status = next_status
+        #     return
         
-        if res != OK and res != ERR_TIRED:
-            logger.warning("[{}] Unknown result from creep.moveByPath({}): {}".format(creep.name, path, res))
-            logger.info("[{}] Resetting path.".format(creep.name))
-            del creep.memory.path_to
-            del creep.memory.path_back
-            creep.memory.status = S_FINDINGWAY
-            return
+        # if res != OK and res != ERR_TIRED:
+        #     logger.warning("[{}] Unknown result from creep.moveByPath({}): {}".format(creep.name, path, res))
+        #     logger.info("[{}] Resetting path.".format(creep.name))
+        #     del creep.memory.path_to
+        #     del creep.memory.path_back
+        #     creep.memory.status = S_FINDINGWAY
+        #     return
     
     if creep.memory.status == S_WORK:
-        source = Game.getObjectById(creep.memory.source_id)
-        result = creep.harvest(source)
-        if result != OK:
-            logger.warning("[{}] Unknown result from creep.harvest({}): {}".format(creep.name, source, result))
-        if creep.store.getFreeCapacity() <= 0:
-            creep.memory.status = S_MOVE
+        creep.memory.status = work(creep)
+        # logger.info("[{}] Status changed to {}.".format(creep.name, creep.memory.status))
         return
+        # source = Game.getObjectById(creep.memory.source_id)
+        # result = creep.harvest(source)
+        # if result != OK:
+        #     logger.warning("[{}] Unknown result from creep.harvest({}): {}".format(creep.name, source, result))
+        # if creep.store.getFreeCapacity() <= 0:
+        #     creep.memory.status = S_MOVE
+        # return
     
     if creep.memory.status == S_TRANSFER:
         target = Game.getObjectById(creep.memory.target_id)

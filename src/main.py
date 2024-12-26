@@ -9,6 +9,7 @@ from harvester_controller import run_harvester
 from upgrader_controller import run_upgrader
 from builder_controller import run_builder
 from attacker_controller import run_attacker
+from repairer_controller import run_repairer
 
 import logger
 from utils import *
@@ -39,6 +40,8 @@ def main():
     # Run each creep
     for name in Object.keys(Game.creeps):
         creep = Game.creeps[name]
+        # creep.suicide()
+        # continue
         if creep.memory.role == ROLE_HARVESTER:
             run_harvester(creep)
         elif creep.memory.role == ROLE_UPGRADER:
@@ -47,6 +50,8 @@ def main():
             run_builder(creep)
         elif creep.memory.role == ROLE_ATTACKER:
             run_attacker(creep)
+        elif creep.memory.role == ROLE_REPAIRER:
+            run_repairer(creep)
         # elif creep.memory.role == ROLE_REPAIRER:
         #     run_repairer(creep)
         # elif creep.memory.role == ROLE_WALL_REPAIRER:
@@ -68,6 +73,8 @@ def main():
             
             elif num_creeps[ROLE_BUILDER] < 6 and spawn.room.energyAvailable >= 250:
                 create_creep(ROLE_BUILDER, spawn, BASE_BUILDER)
+            elif num_creeps[ROLE_REPAIRER] < 2 and spawn.room.energyAvailable >= 250:
+                create_creep(ROLE_REPAIRER, spawn, BASE_REPAIRER)
             
             if spawn.room.find(FIND_HOSTILE_CREEPS).length > 0:
                 if num_creeps[ROLE_ATTACKER] < 5 and spawn.room.energyAvailable >= 300:

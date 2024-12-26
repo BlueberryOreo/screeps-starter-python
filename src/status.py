@@ -23,30 +23,3 @@ S_WANDERING = "wandering"
 S_MOVE_TO_FLAG = "move_to_flag"
 S_FIND_AND_ATTACK = "find_and_attack"
 S_DEAD = "dead"
-
-ROLE_HARVESTER = 'harvester'
-ROLE_UPGRADER = 'upgrader'
-ROLE_BUILDER = 'builder'
-ROLE_REPAIRER = 'repairer'
-ROLE_ATTACKER = 'attacker'
-ROLE_WALL_REPAIRER = 'wall_repairer'
-
-ROLES = [
-    ROLE_HARVESTER, 
-    ROLE_UPGRADER, 
-    ROLE_BUILDER, 
-    ROLE_REPAIRER, 
-    ROLE_WALL_REPAIRER,
-    ROLE_ATTACKER
-]
-
-COMPONENT_COSTS = {
-    WORK: 100,
-    CARRY: 50,
-    MOVE: 50,
-    ATTACK: 80,
-    RANGED_ATTACK: 150,
-    HEAL: 250,
-    CLAIM: 600,
-    TOUGH: 10
-}

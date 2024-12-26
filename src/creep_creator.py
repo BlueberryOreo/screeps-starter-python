@@ -5,8 +5,10 @@ from harvester_controller import create_harvester
 from upgrader_controller import create_upgrader
 from builder_controller import create_builder
 from attacker_controller import create_attacker
+from repairer_controller import create_repairer
 
 from status import *
+from creeps_design import *
 
 __pragma__('noalias', 'name')
 __pragma__('noalias', 'undefined')
@@ -29,7 +31,7 @@ def create_creep(role: str, spawn: StructureSpawn, components: list, memory: dic
         return None
     
     if memory:
-        memory["status"] = S_IDEL
+        memory.status = S_IDEL
     else:
         memory = {"status": S_IDEL}
     
@@ -41,6 +43,8 @@ def create_creep(role: str, spawn: StructureSpawn, components: list, memory: dic
         return create_builder(ROLE_BUILDER + time, spawn, components, memory)
     elif role == ROLE_ATTACKER:
         return create_attacker(ROLE_ATTACKER + time, spawn, components, memory)
+    elif role == ROLE_REPAIRER:
+        return create_repairer(ROLE_REPAIRER + time, spawn, components, memory)
     else:
         logger.warning("Unimplemented role {}.".format(role))
         return None
