@@ -101,7 +101,7 @@ def run_upgrader(creep: Creep):
         target = creep.room.controller
         result = creep.upgradeController(target)
         if result != OK:
-            logger.warning("[{}] Unknown result from creep.transfer({}): {}".format(creep.name, target, result))
+            logger.warning("[{}] Unknown result from creep.upgradeController({}): {}".format(creep.name, target, result))
         if creep.store.getUsedCapacity() <= 0:
             creep.memory.status = S_MOVE
         return

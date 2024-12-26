@@ -103,7 +103,7 @@ def run_builder(creep: Creep):
             return
         result = creep.build(target)
         if result != OK:
-            logger.warning("[{}] Unknown result from creep.transfer({}): {}".format(creep.name, target, result))
+            logger.warning("[{}] Unknown result from creep.build({}): {}".format(creep.name, target, result))
         if creep.store.getUsedCapacity() <= 0:
             creep.memory.status = S_MOVE
         return
