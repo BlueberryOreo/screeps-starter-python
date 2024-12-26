@@ -40,12 +40,12 @@ def run_builder(creep: Creep):
             source = _.sample(creep.room.find(FIND_SOURCES))
             target = _.sample(creep.room.find(FIND_CONSTRUCTION_SITES))
 
-            path_to = creep.room.findPath(target.pos, source.pos)
+            # path_to = creep.room.findPath(target.pos, source.pos)
+            path_to = creep.room.findPath(source.pos, target.pos, {'range': 6})
             start = path_to[path_to.length - 1]
             goal = path_to[0]
             path_back = creep.room.findPath(__new__(RoomPosition(start.x, start.y, creep.room.name)),
                                             __new__(RoomPosition(goal.x, goal.y, creep.room.name)))
-            creep.memory.start = path_to[0]
             creep.memory.path_to = Room.serializePath(path_to)
             creep.memory.path_back = Room.serializePath(path_back)
             # creep.memory.path_to = path_to

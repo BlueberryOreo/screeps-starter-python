@@ -62,6 +62,7 @@ def main():
             # If there are no creeps, spawn a creep once energy is at 250 or more
             if num_creeps[ROLE_HARVESTER] < 5 and spawn.room.energyAvailable >= 250:
                 create_creep(ROLE_HARVESTER, spawn, BASE_HARVESTER)
+                # create_creep(ROLE_HARVESTER, spawn, MEDIUM_HARVESTER)
             elif num_creeps[ROLE_UPGRADER] < 3 and spawn.room.energyAvailable >= 250:
                 create_creep(ROLE_UPGRADER, spawn, BASE_UPGRADER)
             
