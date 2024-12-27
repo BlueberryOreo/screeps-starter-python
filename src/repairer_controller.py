@@ -61,7 +61,7 @@ def run_repairer(creep: Creep):
             creep.memory.source_id = source.id
             creep.memory.target_id = target.id
             source_pos = get_source_pos(source)
-            path_to = creep.room.findPath(creep.pos, source_pos)
+            path_to = creep.room.findPath(target.pos, source_pos)
             start = path_to[path_to.length - 1]
             goal = path_to[0]
             path_back = creep.room.findPath(__new__(RoomPosition(start.x, start.y, creep.room.name)),
