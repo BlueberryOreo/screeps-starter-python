@@ -44,7 +44,7 @@ def run_builder(creep: Creep):
             creep.memory.status = S_FINDINGWAY
         else:
             logger.info("[{}] No construction site found.".format(creep.name))
-            creep.memory.role = _.sample([ROLE_UPGRADER, ROLE_REPAIRER, ROLE_HARVESTER])
+            creep.memory.role = _.sample([ROLE_UPGRADER, ROLE_REPAIRER])
             logger.info("[{}] Role changed to {}.".format(creep.name, creep.memory.role))
             del creep.memory.path_to
             del creep.memory.path_back

@@ -57,11 +57,11 @@ def run_harvester(creep: Creep):
                                lambda s: (s.structureType == STRUCTURE_EXTENSION or s.structureType == STRUCTURE_SPAWN or s.structureType == STRUCTURE_CONTAINER) and s.store.getFreeCapacity(RESOURCE_ENERGY) > 0)
             if targets.length == 0:
                 logger.info("[{}] No target found.".format(creep.name))
-                creep.memory.role = _.sample([ROLE_BUILDER, ROLE_UPGRADER])
+                creep.memory.role = _.sample([ROLE_BUILDER, ROLE_UPGRADER, ROLE_REPAIRER])
                 logger.info("[{}] Role changed to {}.".format(creep.name, creep.memory.role))
                 return
 
-            target = _.sample(targets)
+            target = _.filter(targets, lambda t: t.store.getUsedCapacity())[0]
             source_pos = get_source_pos(source)
             path_to = creep.room.findPath(target.pos, source_pos)
             start = path_to[path_to.length - 1]
