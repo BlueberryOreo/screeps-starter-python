@@ -33,6 +33,7 @@ def count_creeps(spawn: StructureSpawn, role: str = None):
 
 def get_source_pos(source: Source):
     source_pos = source.pos
+    # logger.info("Source: {}, Source pos: {}".format(source, source_pos))
     for i in range(8):
         tmp = __new__(RoomPosition(source_pos.x + dx[i], source_pos.y + dy[i], source_pos.roomName))
         if source.room.getTerrain().get(tmp.x, tmp.y) != TERRAIN_MASK_WALL:
@@ -44,7 +45,12 @@ def get_source_pos(source: Source):
     return source_pos
 
 def waiting(creep: Creep, last_pos: RoomPosition, waiting_time: int = 150):
-    if creep.pos.isEqualTo(last_pos):
+    # logger.info("[{}] Checking waiting. last_pos: {}, current_pos: {}".format(creep.name, last_pos, creep.pos))
+    if not last_pos:
+        creep.memory.waiting = 0
+        return False
+    
+    if creep.pos.x == last_pos.x and creep.pos.y == last_pos.y:
         if creep.memory.waiting:
             creep.memory.waiting += 1
         else:

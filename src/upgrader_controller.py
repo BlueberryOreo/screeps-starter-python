@@ -31,6 +31,12 @@ def run_upgrader(creep: Creep):
     """
         Run the upgrader creep.
     """
+    if waiting(creep, creep.memory.last_pos):
+        del creep.memory.path_to
+        del creep.memory.path_back
+        logger.info("[{}] Crashed. Trying to find a new path.".format(creep.name))
+        creep.memory.status = S_FINDINGWAY
+    
     if creep.memory.status == S_IDEL:
         if creep.spawning:
             return
@@ -64,13 +70,7 @@ def run_upgrader(creep: Creep):
             del creep.memory.start
             return
         # creep.moveTo(creep.memory.start.x, creep.memory.start.y)
-        last_pos = creep.pos
-        creep.moveByPath(creep.memory.find_path)
-        if waiting(creep, last_pos):
-            del creep.memory.path_to
-            del creep.memory.path_back
-            del creep.memory.find_path
-            creep.memory.status = S_FINDINGWAY
+        move(creep, creep.memory.find_path, None)
         return
 
     if creep.memory.status == S_MOVE:

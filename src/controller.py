@@ -34,6 +34,18 @@ def work(creep: Creep):
         return S_MOVE
     return S_WORK
 
+def move(creep: Creep, path=None, target=None):
+    creep.memory.last_pos = creep.pos
+    if path is not None:
+        res = creep.moveByPath(path)
+    elif target is not None:
+        res = creep.moveTo(target)
+    else:
+        logger.warning("[{}] No path or target to move. path: {}, target: {}".format(creep.name, path, target))
+        res = ERR_INVALID_ARGS
+    return res
+    
+
 def worker_move(creep: Creep):
     """
         Move.
@@ -65,8 +77,7 @@ def worker_move(creep: Creep):
             logger.warning("Unknown role: {}.".format(creep.memory.role))
             return S_IDEL
     
-    last_pos = creep.pos
-    res = creep.moveByPath(path)
+    res = move(creep, path, None)
     # logger.info("[{}] Moving to {}, res {}.".format(creep.name, target, res))
     if next_status == S_WORK:
         if creep.pos.isNearTo(target):
@@ -86,8 +97,4 @@ def worker_move(creep: Creep):
         del creep.memory.path_back
         return S_FINDINGWAY
     
-    if waiting(creep, last_pos):
-        del creep.memory.path_to
-        del creep.memory.path_back
-        return S_FINDINGWAY
     return S_MOVE

@@ -31,6 +31,12 @@ def run_repairer(creep: Creep):
     """
         Run the repairer creep.
     """
+    
+    if waiting(creep, creep.memory.last_pos):
+        del creep.memory.path_to
+        del creep.memory.path_back
+        logger.info("[{}] Crashed. Trying to find a new path.".format(creep.name))
+        creep.memory.status = S_FINDINGWAY
 
     if creep.memory.status == S_IDEL:
         if creep.spawning:
@@ -40,10 +46,14 @@ def run_repairer(creep: Creep):
     
     if creep.memory.status == S_FINDINGWAY:
         if not creep.memory.path_to or not creep.memory.path_back:
-            source = creep.room.find(FIND_SOURCES) + creep.room.find(FIND_STRUCTURES, {
-                'filter': lambda s: s.structureType == STRUCTURE_CONTAINER or s.structureType == STRUCTURE_STORAGE
+            source = creep.room.find(FIND_SOURCES)
+            stored_source = creep.room.find(FIND_STRUCTURES, {
+                'filter': lambda s: (s.structureType == STRUCTURE_CONTAINER or s.structureType == STRUCTURE_STORAGE) and s.store.getUsedCapacity(RESOURCE_ENERGY) > 0
             })
-            source = _.sample(source)
+            if stored_source.length > 0:
+                source = _.sample(stored_source)
+            else:
+                source = _.sample(source)
             target = _.sortBy(creep.room.find(FIND_STRUCTURES), lambda s: s.hits / s.hitsMax)[0]
             if not target:
                 creep.memory.status = S_IDEL
@@ -68,13 +78,7 @@ def run_repairer(creep: Creep):
                 del creep.memory.find_path
                 del creep.memory.start
                 return
-            last_pos = creep.pos
-            creep.moveByPath(creep.memory.find_path)
-            if waiting(creep, last_pos):
-                del creep.memory.path_to
-                del creep.memory.path_back
-                del creep.memory.find_path
-                creep.memory.status = S_FINDINGWAY
+            move(creep, creep.memory.find_path, None)
             return
     
     if creep.memory.status == S_MOVE:
