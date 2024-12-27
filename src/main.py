@@ -80,7 +80,7 @@ def main():
                     create_creep(ROLE_HARVESTER, spawn, BASE_HARVESTER)
                     continue
                     
-            if num_creeps[ROLE_HARVESTER] < 6:
+            if num_creeps[ROLE_HARVESTER] < 5:
                 cost = count_cost(MEDIUM_HARVESTER)
                 if spawn.room.energyAvailable >= cost:
                     create_creep(ROLE_HARVESTER, spawn, MEDIUM_HARVESTER)
