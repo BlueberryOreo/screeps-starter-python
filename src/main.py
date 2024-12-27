@@ -71,9 +71,9 @@ def main():
             elif num_creeps[ROLE_UPGRADER] < 4 and spawn.room.energyAvailable >= 250:
                 create_creep(ROLE_UPGRADER, spawn, BASE_UPGRADER)
             
-            elif num_creeps[ROLE_BUILDER] < 5 and spawn.room.energyAvailable >= 250:
+            elif num_creeps[ROLE_BUILDER] < 4 and spawn.room.energyAvailable >= 250:
                 create_creep(ROLE_BUILDER, spawn, BASE_BUILDER)
-            elif num_creeps[ROLE_REPAIRER] < 2 and spawn.room.energyAvailable >= 250:
+            elif num_creeps[ROLE_REPAIRER] < 4 and spawn.room.energyAvailable >= 250:
                 create_creep(ROLE_REPAIRER, spawn, BASE_REPAIRER)
             
             if spawn.room.find(FIND_HOSTILE_CREEPS).length > 0:

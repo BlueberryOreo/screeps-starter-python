@@ -77,6 +77,13 @@ def worker_move(creep: Creep):
             logger.warning("Unknown role: {}.".format(creep.memory.role))
             return S_IDEL
     
+    if target is None:
+        logger.warning("[{}] No target found. Maybe disappered while moving to it.".format(creep.name))
+        logger.info("[{}] Resetting path.".format(creep.name))
+        del creep.memory.path_to
+        del creep.memory.path_back
+        del creep.memory.target_id
+        return S_IDEL
     res = move(creep, path, None)
     # logger.info("[{}] Moving to {}, res {}.".format(creep.name, target, res))
     if next_status == S_WORK:
