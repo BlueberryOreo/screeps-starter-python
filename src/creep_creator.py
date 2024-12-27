@@ -6,6 +6,7 @@ from upgrader_controller import create_upgrader
 from builder_controller import create_builder
 from attacker_controller import create_attacker
 from repairer_controller import create_repairer
+from carrier_controller import create_carrier
 
 from status import *
 from creeps_design import *
@@ -25,7 +26,7 @@ def create_creep(role: str, spawn: StructureSpawn, components: list, memory: dic
         Create a creep.
     """
     time = str(Game.time)
-    total_cost = _.sum(components, lambda c: COMPONENT_COSTS[c])
+    total_cost = count_cost(components)
     if total_cost > spawn.room.energyAvailable:
         logger.info("Not enough energy to create creep: {} > {}.".format(total_cost, spawn.room.energyAvailable))
         return None
@@ -45,6 +46,8 @@ def create_creep(role: str, spawn: StructureSpawn, components: list, memory: dic
         return create_attacker(ROLE_ATTACKER + time, spawn, components, memory)
     elif role == ROLE_REPAIRER:
         return create_repairer(ROLE_REPAIRER + time, spawn, components, memory)
+    elif role == ROLE_CARRIER:
+        return create_carrier(ROLE_CARRIER + time, spawn, components, memory)
     else:
         logger.warning("Unimplemented role {}.".format(role))
         return None

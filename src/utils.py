@@ -1,6 +1,7 @@
 from defs import *
 
 from creeps_design import ROLES
+from status import *
 import logger
 
 __pragma__('noalias', 'name')
@@ -44,7 +45,18 @@ def get_source_pos(source: Source):
             break
     return source_pos
 
-def waiting(creep: Creep, last_pos: RoomPosition, waiting_time: int = 150):
+def move(creep: Creep, path=None, target=None):
+    creep.memory.last_pos = creep.pos
+    if path is not None:
+        res = creep.moveByPath(path)
+    elif target is not None:
+        res = creep.moveTo(target)
+    else:
+        logger.warning("[{}] No path or target to move. path: {}, target: {}".format(creep.name, path, target))
+        res = ERR_INVALID_ARGS
+    return res
+
+def waiting(creep: Creep, last_pos: RoomPosition, waiting_time: int = 100):
     # logger.info("[{}] Checking waiting. last_pos: {}, current_pos: {}".format(creep.name, last_pos, creep.pos))
     if not last_pos:
         creep.memory.waiting = 0
@@ -63,3 +75,32 @@ def waiting(creep: Creep, last_pos: RoomPosition, waiting_time: int = 150):
     else:
         creep.memory.waiting = 0
     return False
+
+def find_path(creep: Creep, source, target):
+    source_pos = get_source_pos(source)
+    path_to = creep.room.findPath(target.pos, source_pos)
+    # path_to = creep.room.findPath(source.pos, target.pos)
+    start = path_to[path_to.length - 1]
+    goal = path_to[0]
+    path_back = creep.room.findPath(__new__(RoomPosition(start.x, start.y, creep.room.name)),
+                                    __new__(RoomPosition(goal.x, goal.y, creep.room.name)))
+    find_path = creep.room.findPath(creep.pos, __new__(RoomPosition(goal.x, goal.y, creep.room.name)))
+    creep.memory.start = goal
+    creep.memory.find_path = Room.serializePath(find_path)
+    creep.memory.path_to = Room.serializePath(path_to)
+    creep.memory.path_back = Room.serializePath(path_back)
+    
+def move_to_start(creep: Creep):
+    if not creep.memory.start:
+        del creep.memory.path_to
+        del creep.memory.path_back
+        logger.info("[{}] No start found.".format(creep.name))
+        creep.memory.status = S_FINDINGWAY
+        return
+    if creep.pos.isEqualTo(creep.memory.start.x, creep.memory.start.y):
+        creep.memory.status = S_MOVE
+        del creep.memory.find_path
+        del creep.memory.start
+        return
+    # creep.moveTo(creep.memory.start.x, creep.memory.start.y)
+    move(creep, creep.memory.find_path, None)

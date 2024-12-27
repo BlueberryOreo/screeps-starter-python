@@ -27,26 +27,28 @@ def work(creep: Creep):
         # creep.memory.status = S_IDEL
         return S_IDEL
     res = creep.harvest(target)
+    if res == ERR_INVALID_TARGET or res == ERR_NO_BODYPART:
+        res = creep.withdraw(target, RESOURCE_ENERGY)
+        
     if res == ERR_NOT_IN_RANGE:
         creep.moveTo(target)
-        return S_WORK
+        return creep.memory.status
+    
+    if res == ERR_NOT_ENOUGH_RESOURCES:
+        logger.info("[{}] Source empty.".format(creep.name))
+        logger.info("[{}] Resetting path.".format(creep.name))
+        del creep.memory.path_to
+        del creep.memory.path_back
+        del creep.memory.source_id
+        return S_FINDINGWAY
+    elif res != OK:
+        logger.warning("[{}] Unknown result from creep.harvest({}): {}".format(creep.name, target, res))
     if creep.store.getFreeCapacity() <= 0:
         return S_MOVE
-    return S_WORK
-
-def move(creep: Creep, path=None, target=None):
-    creep.memory.last_pos = creep.pos
-    if path is not None:
-        res = creep.moveByPath(path)
-    elif target is not None:
-        res = creep.moveTo(target)
-    else:
-        logger.warning("[{}] No path or target to move. path: {}, target: {}".format(creep.name, path, target))
-        res = ERR_INVALID_ARGS
-    return res
+    return creep.memory.status
     
 
-def worker_move(creep: Creep):
+def worker_move(creep: Creep, th=0.5):
     """
         Move.
 
@@ -55,24 +57,54 @@ def worker_move(creep: Creep):
         :return: Next status
     """
 
-    if creep.store.getUsedCapacity() <= 0.5 * creep.store.getCapacity():
+    if creep.store.getUsedCapacity() <= th * creep.store.getCapacity():
         target = Game.getObjectById(creep.memory.source_id)
         path = creep.memory.path_to
-        next_status = S_WORK
+        if creep.memory.role == ROLE_CARRIER:
+            next_status = S_WITHDRAW
+        else:
+            next_status = S_WORK
     else:
         path = creep.memory.path_back
         if creep.memory.role == ROLE_HARVESTER:
             next_status = S_TRANSFER
             target = Game.getObjectById(creep.memory.target_id)
+            if target.store.getFreeCapacity(RESOURCE_ENERGY) <= 0:
+                logger.info("[{}] Target full, resetting path.".format(creep.name))
+                del creep.memory.path_to
+                del creep.memory.path_back
+                del creep.memory.target_id
+                return S_IDEL
         elif creep.memory.role == ROLE_UPGRADER:
             next_status = S_UPGRADE
             target = creep.room.controller
         elif creep.memory.role == ROLE_BUILDER:
             next_status = S_BUILD
             target = Game.getObjectById(creep.memory.target_id)
+            if target.progress >= target.progressTotal:
+                logger.info("[{}] Target is constructed, resetting path.".format(creep.name))
+                del creep.memory.path_to
+                del creep.memory.path_back
+                del creep.memory.target_id
+                return S_IDEL
         elif creep.memory.role == ROLE_REPAIRER:
             next_status = S_REPAIR
             target = Game.getObjectById(creep.memory.target_id)
+            if target.hits >= target.hitsMax:
+                logger.info("[{}] Target is repaired, resetting path.".format(creep.name))
+                del creep.memory.path_to
+                del creep.memory.path_back
+                del creep.memory.target_id
+                return S_IDEL
+        elif creep.memory.role == ROLE_CARRIER:
+            next_status = S_TRANSFER
+            target = Game.getObjectById(creep.memory.target_id)
+            if target.store.getFreeCapacity(RESOURCE_ENERGY) <= 0:
+                logger.info("[{}] Target full, resetting path.".format(creep.name))
+                del creep.memory.path_to
+                del creep.memory.path_back
+                del creep.memory.target_id
+                return S_IDEL
         else:
             logger.warning("Unknown role: {}.".format(creep.memory.role))
             return S_IDEL
@@ -90,7 +122,7 @@ def worker_move(creep: Creep):
         if creep.pos.isNearTo(target):
             return next_status
     else:
-        if next_status == S_TRANSFER:
+        if next_status == S_TRANSFER or next_status == S_WITHDRAW:
             if creep.pos.isNearTo(target):
                 return next_status
         else:

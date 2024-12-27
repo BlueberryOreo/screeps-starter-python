@@ -46,40 +46,30 @@ def run_repairer(creep: Creep):
     
     if creep.memory.status == S_FINDINGWAY:
         if not creep.memory.path_to or not creep.memory.path_back:
-            source = creep.room.find(FIND_SOURCES)
-            stored_source = creep.room.find(FIND_STRUCTURES, {
-                'filter': lambda s: (s.structureType == STRUCTURE_CONTAINER or s.structureType == STRUCTURE_STORAGE) and s.store.getUsedCapacity(RESOURCE_ENERGY) > 0
-            })
-            if stored_source.length > 0:
-                source = _.sample(stored_source)
+            if creep.room.find(FIND_STRUCTURES, {'filter': lambda s: s.structureType == STRUCTURE_CONTAINER and s.store.getUsedCapacity(RESOURCE_ENERGY) > 0}).length > 0:
+                source = _.sample(creep.room.find(FIND_STRUCTURES, {'filter': lambda s: s.structureType == STRUCTURE_CONTAINER and s.store.getUsedCapacity(RESOURCE_ENERGY) > 0}))
             else:
-                source = _.sample(source)
+                source = _.sample(creep.room.find(FIND_SOURCES))
             target = _.sortBy(creep.room.find(FIND_STRUCTURES), lambda s: s.hits / s.hitsMax)[0]
             if not target:
                 creep.memory.status = S_IDEL
                 return
             creep.memory.source_id = source.id
             creep.memory.target_id = target.id
-            source_pos = get_source_pos(source)
-            path_to = creep.room.findPath(target.pos, source_pos)
-            start = path_to[path_to.length - 1]
-            goal = path_to[0]
-            path_back = creep.room.findPath(__new__(RoomPosition(start.x, start.y, creep.room.name)),
-                                            __new__(RoomPosition(goal.x, goal.y, creep.room.name)))
-            find_path = creep.room.findPath(creep.pos, __new__(RoomPosition(goal.x, goal.y, creep.room.name)))
-            creep.memory.start = goal
-            creep.memory.find_path = Room.serializePath(find_path)
-            creep.memory.path_to = Room.serializePath(path_to)
-            creep.memory.path_back = Room.serializePath(path_back)
-            return
-        else:
-            if creep.pos.isEqualTo(creep.memory.start.x, creep.memory.start.y):
-                creep.memory.status = S_MOVE
-                del creep.memory.find_path
-                del creep.memory.start
-                return
-            move(creep, creep.memory.find_path, None)
-            return
+            find_path(creep, source, target)
+            # source_pos = get_source_pos(source)
+            # path_to = creep.room.findPath(target.pos, source_pos)
+            # start = path_to[path_to.length - 1]
+            # goal = path_to[0]
+            # path_back = creep.room.findPath(__new__(RoomPosition(start.x, start.y, creep.room.name)),
+            #                                 __new__(RoomPosition(goal.x, goal.y, creep.room.name)))
+            # find_path = creep.room.findPath(creep.pos, __new__(RoomPosition(goal.x, goal.y, creep.room.name)))
+            # creep.memory.start = goal
+            # creep.memory.find_path = Room.serializePath(find_path)
+            # creep.memory.path_to = Room.serializePath(path_to)
+            # creep.memory.path_back = Room.serializePath(path_back)
+        move_to_start(creep)
+        return
     
     if creep.memory.status == S_MOVE:
         creep.memory.status = worker_move(creep)
