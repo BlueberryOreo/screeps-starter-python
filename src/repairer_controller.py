@@ -81,7 +81,7 @@ def run_repairer(creep: Creep):
     
     if creep.memory.status == S_REPAIR:
         target = Game.getObjectById(creep.memory.target_id)
-        if not target:
+        if not target or target.hits >= target.hitsMax:
             del creep.memory.target_id
             creep.memory.status = S_IDEL
             return
