@@ -127,7 +127,7 @@ def worker_move(creep: Creep, th=0.5):
         if creep.memory.role == ROLE_HARVESTER:
             next_status = S_TRANSFER
             target = Game.getObjectById(creep.memory.target_id)
-            if target.store.getFreeCapacity(RESOURCE_ENERGY) <= 0:
+            if target and target.store.getFreeCapacity(RESOURCE_ENERGY) <= 0:
                 logger.info("[{}] Target full, resetting path.".format(creep.name))
                 del creep.memory.path_to
                 del creep.memory.path_back
@@ -148,7 +148,7 @@ def worker_move(creep: Creep, th=0.5):
         elif creep.memory.role == ROLE_REPAIRER:
             next_status = S_REPAIR
             target = Game.getObjectById(creep.memory.target_id)
-            if target.hits >= target.hitsMax:
+            if target and target.hits >= target.hitsMax:
                 logger.info("[{}] Target is repaired, resetting path.".format(creep.name))
                 del creep.memory.path_to
                 del creep.memory.path_back
@@ -157,7 +157,7 @@ def worker_move(creep: Creep, th=0.5):
         elif creep.memory.role == ROLE_CARRIER:
             next_status = S_TRANSFER
             target = Game.getObjectById(creep.memory.target_id)
-            if target.store.getFreeCapacity(RESOURCE_ENERGY) <= 0:
+            if target and target.store.getFreeCapacity(RESOURCE_ENERGY) <= 0:
                 logger.info("[{}] Target full, resetting path.".format(creep.name))
                 del creep.memory.path_to
                 del creep.memory.path_back

@@ -72,6 +72,9 @@ def run_repairer(creep: Creep):
             creep.memory.status = S_IDEL
             return
         res = creep.repair(target)
+        if res == ERR_NOT_IN_RANGE:
+            creep.moveTo(target)
+            return
         if res != OK:
             logger.warning("[{}] Unknown result from creep.repair({}): {}".format(creep.name, target, res))
         if creep.store.getUsedCapacity() <= 0:
