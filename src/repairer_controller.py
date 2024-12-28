@@ -42,7 +42,6 @@ def run_repairer(creep: Creep):
         if creep.spawning:
             return
         creep.memory.status = S_FINDINGWAY
-        return
     
     if creep.memory.status == S_FINDINGWAY:
         if not creep.memory.path_to or not creep.memory.path_back:
@@ -57,17 +56,7 @@ def run_repairer(creep: Creep):
             creep.memory.source_id = source.id
             creep.memory.target_id = target.id
             find_path(creep, source, target)
-            # source_pos = get_source_pos(source)
-            # path_to = creep.room.findPath(target.pos, source_pos)
-            # start = path_to[path_to.length - 1]
-            # goal = path_to[0]
-            # path_back = creep.room.findPath(__new__(RoomPosition(start.x, start.y, creep.room.name)),
-            #                                 __new__(RoomPosition(goal.x, goal.y, creep.room.name)))
-            # find_path = creep.room.findPath(creep.pos, __new__(RoomPosition(goal.x, goal.y, creep.room.name)))
-            # creep.memory.start = goal
-            # creep.memory.find_path = Room.serializePath(find_path)
-            # creep.memory.path_to = Room.serializePath(path_to)
-            # creep.memory.path_back = Room.serializePath(path_back)
+
         move_to_start(creep)
         return
     

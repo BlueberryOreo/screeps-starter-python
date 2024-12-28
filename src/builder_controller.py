@@ -50,7 +50,7 @@ def run_builder(creep: Creep):
             logger.info("[{}] Role changed to {}.".format(creep.name, creep.memory.role))
             del creep.memory.path_to
             del creep.memory.path_back
-        return
+            return
 
     if creep.memory.status == S_FINDINGWAY:
         if not creep.memory.start or not creep.memory.path_to or not creep.memory.path_back:
@@ -77,29 +77,6 @@ def run_builder(creep: Creep):
     if creep.memory.status == S_MOVE:
         creep.memory.status = worker_move(creep)
         return
-        # if creep.store.getUsedCapacity() <= 0.5 * creep.store.getCapacity():
-        #     target = Game.getObjectById(creep.memory.source_id)
-        #     path = creep.memory.path_to
-        #     next_status = S_WORK
-        # else:
-        #     target = Game.getObjectById(creep.memory.target_id)
-        #     path = creep.memory.path_back
-        #     next_status = S_BUILD
-        
-        # # last_pos = creep.pos
-        
-        # res = creep.moveByPath(path)
-        # if creep.pos.isNearTo(target):
-        #     creep.memory.status = next_status
-        #     return
-        
-        # if res != OK and res != ERR_TIRED:
-        #     logger.warning("[{}] Unknown result from creep.moveByPath({}): {}".format(creep.name, path, res))
-        #     logger.info("[{}] Resetting path.".format(creep.name))
-        #     del creep.memory.path_to
-        #     del creep.memory.path_back
-        #     creep.memory.status = S_FINDINGWAY
-        #     return
         
         # TODO: Avoid the creep in the path.
         # if last_pos.isEqualTo(creep.pos):

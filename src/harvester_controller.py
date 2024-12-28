@@ -47,7 +47,6 @@ def run_harvester(creep: Creep):
         if creep.spawning:
             return
         creep.memory.status = S_FINDINGWAY
-        return
 
     if creep.memory.status == S_FINDINGWAY:
         if not creep.memory.path_to or not creep.memory.path_back:

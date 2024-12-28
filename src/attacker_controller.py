@@ -32,7 +32,6 @@ def run_attacker(creep: Creep):
         if creep.spawning:
             return
         creep.memory.status = S_WANDERING
-        return
     
     if creep.memory.status == S_WANDERING:
         del creep.memory.target
