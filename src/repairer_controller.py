@@ -50,6 +50,7 @@ def run_repairer(creep: Creep):
             else:
                 source = _.sample(creep.room.find(FIND_SOURCES))
             target = _.sortBy(creep.room.find(FIND_STRUCTURES, {'filter': lambda s: s.structureType != STRUCTURE_WALL and s.structureType != Memory.dismantle_type}), lambda s: s.hits / s.hitsMax)[0]
+            # target = _.sample(creep.room.find(FIND_STRUCTURES, {'filter': lambda s: s.structureType != STRUCTURE_WALL and s.structureType != Memory.dismantle_type and s.hits < s.hitsMax}))
             if not target:
                 creep.memory.status = S_IDEL
                 return

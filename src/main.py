@@ -116,14 +116,6 @@ def main():
                     create_creep(ROLE_CARRIER, spawn, CARRIER)
                     continue
             
-            if spawn.room.find(FIND_STRUCTURES, {"filter": lambda s: s.hits < s.hitsMax * 0.5}).length > 0:
-                if num_creeps[ROLE_REPAIRER] < 2:
-                    cost = count_cost(MEDIUM_REPAIRER)
-                    if spawn.room.energyAvailable >= cost:
-                        create_creep(ROLE_REPAIRER, spawn, MEDIUM_REPAIRER)
-                        continue
-                    # create_creep(ROLE_REPAIRER, spawn, BASE_REPAIRER)
-            
             if spawn.room.find(FIND_CONSTRUCTION_SITES).length > 0:
                 if num_creeps[ROLE_BUILDER] < 4:
                     cost = count_cost(MEDIUM_BUILDER)
@@ -131,6 +123,14 @@ def main():
                         create_creep(ROLE_BUILDER, spawn, MEDIUM_BUILDER)
                         continue
                 # create_creep(ROLE_BUILDER, spawn, BASE_BUILDER)
+            
+            if spawn.room.find(FIND_STRUCTURES, {"filter": lambda s: s.hits < s.hitsMax * 0.5}).length > 0:
+                if num_creeps[ROLE_REPAIRER] < 2:
+                    cost = count_cost(MEDIUM_REPAIRER)
+                    if spawn.room.energyAvailable >= cost:
+                        create_creep(ROLE_REPAIRER, spawn, MEDIUM_REPAIRER)
+                        continue
+                    # create_creep(ROLE_REPAIRER, spawn, BASE_REPAIRER)
                 
             if num_creeps[ROLE_REPAIRER] < 4:
                 cost = count_cost(MEDIUM_REPAIRER)

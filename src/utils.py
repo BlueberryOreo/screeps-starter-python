@@ -82,6 +82,13 @@ def find_path(creep: Creep, source, target):
     # path_to = creep.room.findPath(source.pos, target.pos)
     start = path_to[path_to.length - 1]
     goal = path_to[0]
+    if not start or not goal:
+        logger.warning("[{}] No start or goal found, start: {}, goal: {}, path_to: {}.".format(creep.name, start, goal, path_to))
+        logger.warning("[{}] Source: {}, Target: {}".format(creep.name, source, target))
+        del creep.memory.path_to
+        del creep.memory.path_back
+        creep.memory.status = S_FINDINGWAY
+        return
     path_back = creep.room.findPath(__new__(RoomPosition(start.x, start.y, creep.room.name)),
                                     __new__(RoomPosition(goal.x, goal.y, creep.room.name)))
     find_path = creep.room.findPath(creep.pos, __new__(RoomPosition(goal.x, goal.y, creep.room.name)))
