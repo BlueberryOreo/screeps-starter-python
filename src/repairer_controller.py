@@ -46,10 +46,10 @@ def run_repairer(creep: Creep):
     
     if creep.memory.status == S_FINDINGWAY:
         if not creep.memory.path_to or not creep.memory.path_back:
-            # if creep.room.find(FIND_STRUCTURES, {'filter': lambda s: s.structureType == STRUCTURE_CONTAINER and s.store.getUsedCapacity(RESOURCE_ENERGY) > 0}).length > 0:
-            #     source = _.sample(creep.room.find(FIND_STRUCTURES, {'filter': lambda s: s.structureType == STRUCTURE_CONTAINER and s.store.getUsedCapacity(RESOURCE_ENERGY) > 0}))
-            # else:
-            source = _.sample(creep.room.find(FIND_SOURCES))
+            if creep.room.find(FIND_STRUCTURES, {'filter': lambda s: s.structureType == STRUCTURE_CONTAINER and s.store.getUsedCapacity(RESOURCE_ENERGY) > 0}).length > 0:
+                source = _.sample(creep.room.find(FIND_STRUCTURES, {'filter': lambda s: s.structureType == STRUCTURE_CONTAINER and s.store.getUsedCapacity(RESOURCE_ENERGY) > 0}))
+            else:
+                source = _.sample(creep.room.find(FIND_SOURCES))
             target = _.sortBy(creep.room.find(FIND_STRUCTURES, {'filter': lambda s: s.structureType != STRUCTURE_WALL}), lambda s: s.hits / s.hitsMax)[0]
             if not target:
                 creep.memory.status = S_IDEL
@@ -89,5 +89,8 @@ def run_repairer(creep: Creep):
         if res != OK:
             logger.warning("[{}] Unknown result from creep.repair({}): {}".format(creep.name, target, res))
         if creep.store.getUsedCapacity() <= 0:
-            creep.memory.status = S_MOVE
+            # Find a new target, in case fix the current target forever.
+            del creep.memory.path_to
+            del creep.memory.path_back
+            creep.memory.status = S_FINDINGWAY
         return

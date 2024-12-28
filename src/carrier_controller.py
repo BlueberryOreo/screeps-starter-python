@@ -48,7 +48,7 @@ def run_carrier(creep: Creep):
     if creep.memory.status == S_FINDINGWAY:
         if not creep.memory.path_to or not creep.memory.path_back:
             source = _.sample(creep.room.find(FIND_STRUCTURES, {'filter': lambda s: s.structureType == STRUCTURE_CONTAINER and s.store.getUsedCapacity(RESOURCE_ENERGY) > 0}))
-            target = _.sortBy(creep.room.find(FIND_MY_STRUCTURES, {'filter': lambda s: s.structureType == STRUCTURE_SPAWN or s.structureType == STRUCTURE_EXTENSION}), lambda s: s.store.getUsedCapacity(RESOURCE_ENERGY) / s.store.getCapacity(RESOURCE_ENERGY) * 100)[0]
+            target = _.sortBy(creep.room.find(FIND_MY_STRUCTURES, {'filter': lambda s: s.structureType != STRUCTURE_RAMPART and s.structureType != STRUCTURE_CONTROLLER}), lambda s: s.store.getUsedCapacity(RESOURCE_ENERGY) / s.store.getCapacity(RESOURCE_ENERGY) * 100)[0]
             if not target or not source:
                 creep.memory.status = S_IDEL
                 return

@@ -12,6 +12,8 @@ from attacker_controller import run_attacker
 from repairer_controller import run_repairer
 from carrier_controller import run_carrier
 
+from tower_controller import run_tower
+
 import logger
 from utils import *
 from status import *
@@ -64,6 +66,10 @@ def main():
     # Run each spawn
     for name in Object.keys(Game.spawns):
         spawn = Game.spawns[name]
+        
+        for tower in spawn.room.find(FIND_MY_STRUCTURES, {"filter": lambda s: s.structureType == STRUCTURE_TOWER}):
+            run_tower(tower)
+
         if not spawn.spawning:
             # Get the number of our creeps in the room.
             num_creeps = count_creeps(spawn)
