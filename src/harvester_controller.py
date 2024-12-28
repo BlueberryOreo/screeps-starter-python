@@ -51,12 +51,25 @@ def run_harvester(creep: Creep):
 
     if creep.memory.status == S_FINDINGWAY:
         if not creep.memory.path_to or not creep.memory.path_back:
-            source = _.sample(creep.room.find(FIND_SOURCES))
+            source = None
+
+            if creep.memory.dismantle_type:
+                sources = creep.room.find(FIND_STRUCTURES, {'filter': lambda s: s.structureType == creep.memory.dismantle_type})
+                source = _.sortBy(sources, lambda s: s.hits / s.hitsMax)[0] # find the structure with the lowest hits
+            
+            if not creep.memory.dismantle_type or not source:
+                source = _.sample(creep.room.find(FIND_SOURCES))
+                if not source:
+                    logger.info("[{}] No source found.".format(creep.name))
+                    return S_IDEL
+                if creep.memory.dismantle_type:
+                    del Memory.dismantle_type
+                    del creep.memory.dismantle_type
             # spawn = _.sample(creep.room.find(FIND_MY_SPAWNS))
             targets = _.filter(creep.room.find(FIND_STRUCTURES), 
                             #    lambda s: (s.structureType == STRUCTURE_SPAWN or s.structureType == STRUCTURE_CONTAINER) and s.store.getFreeCapacity(RESOURCE_ENERGY) > 0
-                               lambda s: (s.structureType == STRUCTURE_CONTAINER and s.store.getFreeCapacity(RESOURCE_ENERGY) > 0) 
-                                            or ((s.structureType == STRUCTURE_SPAWN or s.structureType == STRUCTURE_EXTENSION) and s.store.getFreeCapacity(RESOURCE_ENERGY) > 0)
+                               lambda s: s.structureType == STRUCTURE_CONTAINER and s.store.getFreeCapacity(RESOURCE_ENERGY) > 0
+                                            # or ((s.structureType == STRUCTURE_SPAWN or s.structureType == STRUCTURE_EXTENSION) and s.store.getFreeCapacity(RESOURCE_ENERGY) > 0)
                                )
             if targets.length == 0:
                 logger.info("[{}] No target found.".format(creep.name))
@@ -65,20 +78,10 @@ def run_harvester(creep: Creep):
                 return
 
             target = _.sample(targets)
-            find_path(creep, source, target)
-            # source_pos = get_source_pos(source)
-            # path_to = creep.room.findPath(target.pos, source_pos)
-            # start = path_to[path_to.length - 1]
-            # goal = path_to[0]
-            # path_back = creep.room.findPath(__new__(RoomPosition(start.x, start.y, creep.room.name)),
-            #                                 __new__(RoomPosition(goal.x, goal.y, creep.room.name)))
-            # find_path = creep.room.findPath(creep.pos, __new__(RoomPosition(goal.x, goal.y, creep.room.name)))
-            # creep.memory.start = goal
-            # creep.memory.find_path = Room.serializePath(find_path)
-            # creep.memory.path_to = Room.serializePath(path_to)
-            # creep.memory.path_back = Room.serializePath(path_back)
-            # creep.memory.path_to = path_to
-            # creep.memory.path_back = path_back
+            if creep.memory.dismantle_type and creep.store.getFreeCapacity() > 0:
+                find_path(creep, target, source)
+            else:
+                find_path(creep, source, target)
 
             creep.memory.source_id = source.id
             creep.memory.target_id = target.id
@@ -113,7 +116,10 @@ def run_harvester(creep: Creep):
         #     return
     
     if creep.memory.status == S_WORK:
-        creep.memory.status = work(creep)
+        if creep.memory.dismantle_type:
+            creep.memory.status = destroy(creep)
+        else:
+            creep.memory.status = work(creep)
         # logger.info("[{}] Status changed to {}.".format(creep.name, creep.memory.status))
         return
         # source = Game.getObjectById(creep.memory.source_id)

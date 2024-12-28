@@ -49,6 +49,36 @@ def work(creep: Creep):
     return creep.memory.status
 
 
+def destroy(creep: Creep):
+    """
+        Destroy.
+
+        :param creep: Creep
+
+        :return: Next status
+    """
+    target = Game.getObjectById(creep.memory.source_id)
+    if not target:
+        return S_IDEL
+    if target.structureType and creep.memory.dismantle_type and target.structureType != creep.memory.dismantle_type:
+        logger.info("[{}] Target {} (type {}) is not a {}.".format(creep.name, target, target.structureType, creep.memory.dismantle_type))
+        logger.info("[{}] Resetting path.".format(creep.name))
+        del creep.memory.path_to
+        del creep.memory.path_back
+        return S_FINDINGWAY
+    
+    res = creep.dismantle(target)
+    if res == ERR_NOT_IN_RANGE:
+        creep.moveTo(target)
+        return creep.memory.status
+    if res != OK:
+        logger.warning("[{}] Unknown result from creep.dismantle({}): {}".format(creep.name, target, res))
+    if creep.store.getFreeCapacity() <= 0:
+        return S_MOVE
+    
+    return creep.memory.status
+
+
 def transfer(creep: Creep, target):
     # target = Game.getObjectById(creep.memory.target_id)
     if not target:
