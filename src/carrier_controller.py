@@ -52,8 +52,6 @@ def run_carrier(creep: Creep):
             if not source:
                 creep.memory.status = S_IDEL
                 return
-            if not target:
-                target = source
             creep.memory.source_id = source.id
             creep.memory.target_id = target.id
             find_path(creep, source, target)
