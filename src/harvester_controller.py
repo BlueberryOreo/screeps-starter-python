@@ -126,18 +126,5 @@ def run_harvester(creep: Creep):
     
     if creep.memory.status == S_TRANSFER:
         target = Game.getObjectById(creep.memory.target_id)
-        result = creep.transfer(target, RESOURCE_ENERGY)
-        if result == ERR_FULL:
-            logger.info("[{}] Target {} is full.".format(creep.name, target.name))
-            logger.info("[{}] Trying to find another target.".format(creep.name))
-            creep.memory.status = S_FINDINGWAY
-            del creep.memory.path_to
-            del creep.memory.path_back
-            del creep.memory.target_id
-            return
-        if result != OK:
-            logger.warning("[{}] Unknown result from creep.transfer({}): {}".format(creep.name, target, result))
-        if creep.store.getUsedCapacity() <= 0:
-            creep.memory.status = S_MOVE
-        return
+        creep.memory.status = transfer(creep, target)
 

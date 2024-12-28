@@ -54,15 +54,25 @@ def run_builder(creep: Creep):
 
     if creep.memory.status == S_FINDINGWAY:
         if not creep.memory.start or not creep.memory.path_to or not creep.memory.path_back:
-            if creep.room.find(FIND_STRUCTURES, {'filter': lambda s: s.structureType == STRUCTURE_CONTAINER and s.store.getUsedCapacity(RESOURCE_ENERGY) > 0}).length > 0:
+            if creep.memory.dismentle_type or creep.room.find(FIND_STRUCTURES, {'filter': lambda s: s.structureType == STRUCTURE_CONTAINER and s.store.getUsedCapacity(RESOURCE_ENERGY) > 0}).length > 0:
                 source = _.sample(creep.room.find(FIND_STRUCTURES, {'filter': lambda s: s.structureType == STRUCTURE_CONTAINER and s.store.getUsedCapacity(RESOURCE_ENERGY) > 0}))
             else:
                 source = _.sample(creep.room.find(FIND_SOURCES))
-            target = creep.room.find(FIND_CONSTRUCTION_SITES)
+            
+            if creep.memory.dismentle_type:
+                target = creep.room.find(FIND_STRUCTURES, {'filter': lambda s: s.structureType == creep.memory.dismentle_type})
+                if target.length == 0:
+                    del creep.memory.dismentle_type
+            else:
+                target = creep.room.find(FIND_CONSTRUCTION_SITES)
             if target.length == 0:
                 creep.memory.status = S_IDEL
                 return
-            target = _.sortBy(target, lambda t: t.progressTotal - t.progress)[0] # Find the construction site with the most progress.
+            
+            if creep.memory.dismentle_type:
+                target = _.sortBy(target, lambda t: t.hits)[0] # Find the structure with the least hits.
+            else:
+                target = _.sortBy(target, lambda t: t.progressTotal - t.progress)[0] # Find the construction site with the most progress.
 
             find_path(creep, source, target)
 
@@ -111,7 +121,11 @@ def run_builder(creep: Creep):
                 
     
     if creep.memory.status == S_WORK:
-        creep.memory.status = work(creep)
+        if creep.memory.dismentle_type:
+            target = Game.getObjectById(creep.memory.source_id)
+            creep.memory.status = transfer(creep, target)
+        else:
+            creep.memory.status = work(creep)
         return
     
     if creep.memory.status == S_BUILD:
@@ -122,9 +136,24 @@ def run_builder(creep: Creep):
             del creep.memory.path_back
             del creep.memory.target_id
             return
-        result = creep.build(target)
+        if creep.memory.dismentle_type:
+            result = creep.dismantle(target)
+        else:
+            result = creep.build(target)
         if result != OK:
             logger.warning("[{}] Unknown result from creep.build({}): {}".format(creep.name, target, result))
-        if creep.store.getUsedCapacity() <= 0:
-            creep.memory.status = S_MOVE
+        
+        if creep.memory.dismentle_type:
+            if target.hits <= 0:
+                logger.info("[{}] Target {} dismentled.".format(creep.name, target))
+                if creep.store.getFreeCapacity() <= 0:
+                    creep.memory.status = S_MOVE
+                else:
+                    creep.memory.status = S_FINDINGWAY
+                    del creep.memory.path_to
+                    del creep.memory.path_back
+                    del creep.memory.target_id
+        else:
+            if creep.store.getUsedCapacity() <= 0:
+                creep.memory.status = S_MOVE
         return

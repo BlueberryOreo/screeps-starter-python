@@ -45,6 +45,34 @@ def work(creep: Creep):
         logger.warning("[{}] Unknown result from creep.harvest({}): {}".format(creep.name, target, res))
     if creep.store.getFreeCapacity() <= 0:
         return S_MOVE
+    
+    return creep.memory.status
+
+
+def transfer(creep: Creep, target):
+    # target = Game.getObjectById(creep.memory.target_id)
+    if not target:
+        return S_IDEL
+    result = creep.transfer(target, RESOURCE_ENERGY)
+    if result == ERR_FULL:
+        logger.info("[{}] Target {} is full.".format(creep.name, target.name))
+        logger.info("[{}] Trying to find another target.".format(creep.name))
+        del creep.memory.path_to
+        del creep.memory.path_back
+        del creep.memory.target_id
+        return S_FINDINGWAY
+    if result == ERR_INVALID_TARGET:
+        logger.info("[{}] Target {} invalid.".format(creep.name, target.name))
+        logger.info("[{}] Resetting path.".format(creep.name))
+        del creep.memory.path_to
+        del creep.memory.path_back
+        del creep.memory.target_id
+        return S_FINDINGWAY
+    if result != OK:
+        logger.warning("[{}] Unknown result from creep.transfer({}): {}".format(creep.name, target, result))
+    if creep.store.getUsedCapacity() <= 0:
+        return S_MOVE
+    
     return creep.memory.status
     
 
@@ -136,4 +164,4 @@ def worker_move(creep: Creep, th=0.5):
         del creep.memory.path_back
         return S_FINDINGWAY
     
-    return S_MOVE
+    return creep.memory.status
