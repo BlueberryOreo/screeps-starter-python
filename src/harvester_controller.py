@@ -55,7 +55,8 @@ def run_harvester(creep: Creep):
 
             if creep.memory.dismantle_type:
                 sources = creep.room.find(FIND_STRUCTURES, {'filter': lambda s: s.structureType == creep.memory.dismantle_type})
-                source = _.sortBy(sources, lambda s: s.hits / s.hitsMax)[0] # find the structure with the lowest hits
+                # source = _.sortBy(sources, lambda s: s.hits / s.hitsMax)[0] # find the structure with the lowest hits
+                source = _.sample(sources)
             
             if not creep.memory.dismantle_type or not source:
                 source = _.sample(creep.room.find(FIND_SOURCES))
