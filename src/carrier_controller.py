@@ -71,7 +71,7 @@ def run_carrier(creep: Creep):
         target = Game.getObjectById(creep.memory.target_id)
         result = creep.transfer(target, RESOURCE_ENERGY)
         if result == ERR_FULL:
-            logger.info("[{}] Target {} is full.".format(creep.name, target.name))
+            logger.info("[{}] Target {} is full.".format(creep.name, target))
             logger.info("[{}] Trying to find another target.".format(creep.name))
             creep.memory.status = S_FINDINGWAY
             del creep.memory.path_to
