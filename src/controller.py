@@ -139,7 +139,7 @@ def worker_move(creep: Creep, th=0.5):
         elif creep.memory.role == ROLE_BUILDER:
             next_status = S_BUILD
             target = Game.getObjectById(creep.memory.target_id)
-            if target.progress >= target.progressTotal:
+            if not target or target.progress >= target.progressTotal:
                 logger.info("[{}] Target is constructed, resetting path.".format(creep.name))
                 del creep.memory.path_to
                 del creep.memory.path_back
