@@ -56,15 +56,12 @@ def run_carrier(creep: Creep):
             find_path(creep, source, target)
         
         move_to_start(creep)
-        return
 
     if creep.memory.status == S_MOVE:
         creep.memory.status = worker_move(creep, 0)
-        return
     
     if creep.memory.status == S_WITHDRAW:
         creep.memory.status = work(creep)
-        return
     
     if creep.memory.status == S_TRANSFER:
         target = Game.getObjectById(creep.memory.target_id)
@@ -81,5 +78,4 @@ def run_carrier(creep: Creep):
             logger.warning("[{}] Unknown result from creep.transfer({}): {}".format(creep.name, target, result))
         if creep.store.getUsedCapacity() <= 0:
             creep.memory.status = S_MOVE
-        return
     

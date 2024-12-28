@@ -58,15 +58,12 @@ def run_repairer(creep: Creep):
             find_path(creep, source, target)
 
         move_to_start(creep)
-        return
     
     if creep.memory.status == S_MOVE:
         creep.memory.status = worker_move(creep)
-        return
         
     if creep.memory.status == S_WORK:
         creep.memory.status = work(creep)
-        return
     
     if creep.memory.status == S_REPAIR:
         target = Game.getObjectById(creep.memory.target_id)
@@ -82,4 +79,3 @@ def run_repairer(creep: Creep):
             del creep.memory.path_to
             del creep.memory.path_back
             creep.memory.status = S_FINDINGWAY
-        return

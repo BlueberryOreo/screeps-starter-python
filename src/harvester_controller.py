@@ -87,33 +87,10 @@ def run_harvester(creep: Creep):
             creep.memory.target_id = target.id
         
         move_to_start(creep)
-        return
 
     if creep.memory.status == S_MOVE:
         creep.memory.status = worker_move(creep)
         # logger.info("[{}] Status changed to {}.".format(creep.name, creep.memory.status))
-        return
-        # if creep.store.getUsedCapacity() <= 0.5 * creep.store.getCapacity():
-        #     target = Game.getObjectById(creep.memory.source_id)
-        #     path = creep.memory.path_to
-        #     next_status = S_WORK
-        # else:
-        #     target = Game.getObjectById(creep.memory.target_id)
-        #     path = creep.memory.path_back
-        #     next_status = S_TRANSFER
-        
-        # res = creep.moveByPath(path)
-        # if creep.pos.isNearTo(target):
-        #     creep.memory.status = next_status
-        #     return
-        
-        # if res != OK and res != ERR_TIRED:
-        #     logger.warning("[{}] Unknown result from creep.moveByPath({}): {}".format(creep.name, path, res))
-        #     logger.info("[{}] Resetting path.".format(creep.name))
-        #     del creep.memory.path_to
-        #     del creep.memory.path_back
-        #     creep.memory.status = S_FINDINGWAY
-        #     return
     
     if creep.memory.status == S_WORK:
         if creep.memory.dismantle_type:
@@ -121,14 +98,6 @@ def run_harvester(creep: Creep):
         else:
             creep.memory.status = work(creep)
         # logger.info("[{}] Status changed to {}.".format(creep.name, creep.memory.status))
-        return
-        # source = Game.getObjectById(creep.memory.source_id)
-        # result = creep.harvest(source)
-        # if result != OK:
-        #     logger.warning("[{}] Unknown result from creep.harvest({}): {}".format(creep.name, source, result))
-        # if creep.store.getFreeCapacity() <= 0:
-        #     creep.memory.status = S_MOVE
-        # return
     
     if creep.memory.status == S_TRANSFER:
         target = Game.getObjectById(creep.memory.target_id)

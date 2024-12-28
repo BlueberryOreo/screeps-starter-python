@@ -55,47 +55,12 @@ def run_upgrader(creep: Creep):
             creep.memory.source_id = source.id
         
         move_to_start(creep)
-        return
 
     if creep.memory.status == S_MOVE:
         creep.memory.status = worker_move(creep)
-        # if creep.store.getUsedCapacity() <= 0.5 * creep.store.getCapacity():
-        #     target = Game.getObjectById(creep.memory.source_id)
-        #     path = creep.memory.path_to
-        #     next_status = S_WORK
-        # else:
-        #     target = creep.room.controller
-        #     path = creep.memory.path_back
-        #     next_status = S_UPGRADE
-        
-        # res = creep.moveByPath(path)
-        # if next_status == S_WORK:
-        #     if creep.pos.isNearTo(target):
-        #         creep.memory.status = next_status
-        #         return
-        # else:
-        #     if creep.pos.inRangeTo(target, 3):
-        #         creep.memory.status = next_status
-        #         return
-            
-        # if res != OK and res != ERR_TIRED:
-        #     logger.warning("[{}] Unknown result from creep.moveByPath({}): {}".format(creep.name, path, res))
-        #     logger.info("[{}] Resetting path.".format(creep.name))
-        #     del creep.memory.path_to
-        #     del creep.memory.path_back
-        #     creep.memory.status = S_FINDINGWAY
-        #     return
     
     if creep.memory.status == S_WORK:
         creep.memory.status = work(creep)
-        return
-    #     source = Game.getObjectById(creep.memory.source_id)
-    #     result = creep.harvest(source)
-    #     if result != OK:
-    #         logger.warning("[{}] Unknown result from creep.harvest({}): {}".format(creep.name, source, result))
-    #     if creep.store.getFreeCapacity() <= 0:
-    #         creep.memory.status = S_MOVE
-    #     return
     
     if creep.memory.status == S_UPGRADE:
         target = creep.room.controller
@@ -104,4 +69,3 @@ def run_upgrader(creep: Creep):
             logger.warning("[{}] Unknown result from creep.upgradeController({}): {}".format(creep.name, target, result))
         if creep.store.getUsedCapacity() <= 0:
             creep.memory.status = S_MOVE
-        return

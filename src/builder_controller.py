@@ -72,11 +72,9 @@ def run_builder(creep: Creep):
             creep.memory.target_id = target.id
         
         move_to_start(creep)
-        return
 
     if creep.memory.status == S_MOVE:
         creep.memory.status = worker_move(creep)
-        return
         
         # TODO: Avoid the creep in the path.
         # if last_pos.isEqualTo(creep.pos):
@@ -91,7 +89,6 @@ def run_builder(creep: Creep):
     
     if creep.memory.status == S_WORK:
         creep.memory.status = work(creep)
-        return
     
     if creep.memory.status == S_BUILD:
         target = Game.getObjectById(creep.memory.target_id)
@@ -107,4 +104,3 @@ def run_builder(creep: Creep):
         
         if creep.store.getUsedCapacity() <= 0:
             creep.memory.status = S_MOVE
-        return
