@@ -35,14 +35,14 @@ def run_tower(tower: StructureTower):
             logger.warning("[{}] Failed to attack: {}. Error code: {}.".format(tower, target, res))
         return
     
-    # damaged_my_structures = tower.room.find(FIND_MY_STRUCTURES, {'filter': lambda s: s.hits < 0.5 * s.hitsMax})
-    # damaged_public_structures = tower.room.find(FIND_STRUCTURES, {'filter': lambda s: s.hits < 0.5 * s.hitsMax})
-    # if damaged_my_structures.length > 0:
-    #     target = _.sortBy(damaged_my_structures, lambda s: s.hits / s.hitsMax)[0]
-    #     res = tower.repair(target)
-    #     if res != OK:
-    #         logger.warning("[{}] Failed to repair: {}. Error code: {}.".format(tower, target, res))
-    #     return
+    damaged_my_structures = tower.room.find(FIND_MY_STRUCTURES, {'filter': lambda s: s.hits / s.hitsMax < 0.01})
+    # damaged_public_structures = tower.room.find(FIND_STRUCTURES, {'filter': lambda s: s.hits < s.hitsMax})
+    if damaged_my_structures.length > 0:
+        target = _.sortBy(damaged_my_structures, lambda s: s.hits / s.hitsMax)[0]
+        res = tower.repair(target)
+        if res != OK:
+            logger.warning("[{}] Failed to repair: {}. Error code: {}.".format(tower, target, res))
+        return
     # elif damaged_public_structures.length > 0:
     #     target = _.sortBy(damaged_public_structures, lambda s: s.hits / s.hitsMax)[0]
     #     res = tower.repair(target)

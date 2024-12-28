@@ -108,7 +108,7 @@ def main():
                     continue
             
             if spawn.room.find(FIND_STRUCTURES, {"filter": lambda s: s.hits < s.hitsMax * 0.5}).length > 0:
-                if num_creeps[ROLE_REPAIRER] < 4:
+                if num_creeps[ROLE_REPAIRER] < 2:
                     cost = count_cost(MEDIUM_REPAIRER)
                     if spawn.room.energyAvailable >= cost:
                         create_creep(ROLE_REPAIRER, spawn, MEDIUM_REPAIRER)
