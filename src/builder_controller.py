@@ -54,10 +54,10 @@ def run_builder(creep: Creep):
 
     if creep.memory.status == S_FINDINGWAY:
         if not creep.memory.start or not creep.memory.path_to or not creep.memory.path_back:
-            if creep.room.find(FIND_STRUCTURES, {'filter': lambda s: s.structureType == STRUCTURE_CONTAINER and s.store.getUsedCapacity(RESOURCE_ENERGY) > 0.5 * s.store.getCapacity(RESOURCE_ENERGY)}).length > 0:
-                source = _.sample(creep.room.find(FIND_STRUCTURES, {'filter': lambda s: s.structureType == STRUCTURE_CONTAINER and s.store.getUsedCapacity(RESOURCE_ENERGY) > 0.5 * s.store.getCapacity(RESOURCE_ENERGY)}))
-            else:
-                source = _.sample(creep.room.find(FIND_SOURCES))
+            # if creep.room.find(FIND_STRUCTURES, {'filter': lambda s: s.structureType == STRUCTURE_CONTAINER and s.store.getUsedCapacity(RESOURCE_ENERGY) > 0.5 * s.store.getCapacity(RESOURCE_ENERGY)}).length > 0:
+            source = _.sample(creep.room.find(FIND_STRUCTURES, {'filter': lambda s: s.structureType == STRUCTURE_CONTAINER and s.store.getUsedCapacity(RESOURCE_ENERGY) > 0}))
+            # else:
+                # source = _.sample(creep.room.find(FIND_SOURCES))
             
             target = creep.room.find(FIND_CONSTRUCTION_SITES)
             if target.length == 0:

@@ -49,7 +49,7 @@ def run_harvester(creep: Creep):
         creep.memory.status = S_FINDINGWAY
 
     if creep.memory.status == S_FINDINGWAY:
-        if not creep.memory.path_to or not creep.memory.path_back:
+        if not creep.memory.path_to or not creep.memory.path_back or not creep.memory.source_id:
             source = None
 
             if creep.memory.dismantle_type:
@@ -66,11 +66,41 @@ def run_harvester(creep: Creep):
                     del Memory.dismantle_type
                     del creep.memory.dismantle_type
             # spawn = _.sample(creep.room.find(FIND_MY_SPAWNS))
-            targets = _.filter(creep.room.find(FIND_STRUCTURES), 
-                            #    lambda s: (s.structureType == STRUCTURE_SPAWN or s.structureType == STRUCTURE_CONTAINER) and s.store.getFreeCapacity(RESOURCE_ENERGY) > 0
-                               lambda s: s.structureType == STRUCTURE_CONTAINER and s.store.getFreeCapacity(RESOURCE_ENERGY) > 0
-                                            # or ((s.structureType == STRUCTURE_SPAWN or s.structureType == STRUCTURE_EXTENSION) and s.store.getFreeCapacity(RESOURCE_ENERGY) > 0)
-                               )
+            if creep.memory.dismantle_type:
+                targets = _.filter(creep.room.find(FIND_STRUCTURES), 
+                                #    lambda s: (s.structureType == STRUCTURE_SPAWN or s.structureType == STRUCTURE_CONTAINER) and s.store.getFreeCapacity(RESOURCE_ENERGY) > 0
+                                lambda s: s.structureType == STRUCTURE_CONTAINER and s.store.getFreeCapacity(RESOURCE_ENERGY) > 0
+                                                # or ((s.structureType == STRUCTURE_SPAWN or s.structureType == STRUCTURE_EXTENSION) and s.store.getFreeCapacity(RESOURCE_ENERGY) > 0)
+                                )
+            else:
+                # Find the container beside the source.
+                targets = []
+                for i in range(8):
+                    tmp_x = source.pos.x + dx[i]
+                    tmp_y = source.pos.y + dy[i]
+                    pos = __new__(RoomPosition(tmp_x, tmp_y, creep.room.name))
+                    targets = pos.look()
+                    if targets.length > 0:
+                        flag = True
+                        free_capacity = 0
+                        for target in targets:
+                            if target.type == "creep":
+                                flag = False
+                                break
+                                
+                            if target.type == "structure" and target.structure.structureType == STRUCTURE_CONTAINER:
+                                free_capacity += target.structure.store.getFreeCapacity(RESOURCE_ENERGY)
+                        if free_capacity <= 0:
+                            flag = False
+                        if flag:
+                            break
+                target = None
+                for tmp in targets:
+                    if tmp.type == "structure" and tmp.structure.structureType == STRUCTURE_CONTAINER:
+                        target = tmp.structure
+                        break
+                targets = [target]
+                
             if targets.length == 0:
                 logger.info("[{}] No target found.".format(creep.name))
                 creep.memory.role = _.sample([ROLE_BUILDER, ROLE_UPGRADER, ROLE_REPAIRER])
@@ -84,7 +114,8 @@ def run_harvester(creep: Creep):
                 find_path(creep, source, target)
 
             creep.memory.source_id = source.id
-            creep.memory.target_id = target.id
+            if creep.memory.dismantle_type:
+                creep.memory.target_id = target.id
         
         move_to_start(creep)
 
@@ -100,6 +131,21 @@ def run_harvester(creep: Creep):
         # logger.info("[{}] Status changed to {}.".format(creep.name, creep.memory.status))
     
     if creep.memory.status == S_TRANSFER:
-        target = Game.getObjectById(creep.memory.target_id)
+        if creep.memory.dismantle_type:
+            target = Game.getObjectById(creep.memory.target_id)
+        else:
+            target = None
+            for i in range(8):
+                tmp_x = creep.pos.x + dx[i]
+                tmp_y = creep.pos.y + dy[i]
+                pos = __new__(RoomPosition(tmp_x, tmp_y, creep.room.name))
+                target = pos.lookFor(LOOK_STRUCTURES)[0]
+                if target and target.structureType == STRUCTURE_CONTAINER and target.store.getFreeCapacity(RESOURCE_ENERGY) > 0:
+                    break
+            if not target:
+                logger.info("[{}] No available target found.".format(creep.name))
+                logger.info("[{}] Waiting.".format(creep.name))
+                creep.memory.status = S_TRANSFER
+                return
         creep.memory.status = transfer(creep, target)
 

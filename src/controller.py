@@ -36,6 +36,10 @@ def work(creep: Creep):
     
     if res == ERR_NOT_ENOUGH_RESOURCES:
         logger.info("[{}] Source empty.".format(creep.name))
+        if creep.memory.role == ROLE_HARVESTER:
+            logger.info("[{}] Waiting for source to be refilled.".format(creep.name))
+            return S_WORK
+        
         logger.info("[{}] Resetting path.".format(creep.name))
         del creep.memory.path_to
         del creep.memory.path_back
@@ -43,7 +47,17 @@ def work(creep: Creep):
         return S_FINDINGWAY
     elif res != OK:
         logger.warning("[{}] Unknown result from creep.harvest({}): {}".format(creep.name, target, res))
-    if creep.store.getFreeCapacity() <= 0:
+    
+    if creep.memory.role == ROLE_HARVESTER and not creep.memory.dismantle_type:
+        # stand_item = creep.room.lookForAt(STRUCTURE_CONTAINER, creep.pos.x, creep.pos.y)
+        stand_item = creep.pos.lookFor(LOOK_STRUCTURES)[0]
+        if stand_item:
+            if stand_item.structureType == STRUCTURE_CONTAINER or stand_item.structureType == STRUCTURE_STORAGE:
+                creep.drop(RESOURCE_ENERGY)
+        else:
+            if creep.store.getFreeCapacity() <= 0:
+                return S_TRANSFER
+    elif creep.store.getFreeCapacity() <= 0:
         return S_MOVE
     
     return creep.memory.status
@@ -101,6 +115,8 @@ def transfer(creep: Creep, target):
     if result != OK:
         logger.warning("[{}] Unknown result from creep.transfer({}): {}".format(creep.name, target, result))
     if creep.store.getUsedCapacity() <= 0:
+        if creep.memory.role == ROLE_HARVESTER:
+            return S_WORK
         return S_MOVE
     
     return creep.memory.status

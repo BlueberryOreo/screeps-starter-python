@@ -1,6 +1,6 @@
 from defs import *
 
-from creeps_design import ROLES
+from creeps_design import *
 from status import *
 import logger
 
@@ -77,7 +77,17 @@ def waiting(creep: Creep, last_pos: RoomPosition, waiting_time: int = 100):
     return False
 
 def find_path(creep: Creep, source, target):
+    if not source:
+        logger.warning("[{}] No source found.".format(creep.name))
+        creep.memory.status = S_FINDINGWAY
+        return
     source_pos = get_source_pos(source)
+    if creep.memory.role == ROLE_HARVESTER and not creep.memory.dismantle_type:
+        find_path = creep.room.findPath(creep.pos, source_pos)
+        creep.memory.start = source_pos
+        creep.memory.find_path = Room.serializePath(find_path)
+        return
+    
     path_to = creep.room.findPath(target.pos, source_pos)
     # path_to = creep.room.findPath(source.pos, target.pos)
     start = path_to[path_to.length - 1]
@@ -108,6 +118,10 @@ def move_to_start(creep: Creep):
         creep.memory.status = S_MOVE
         del creep.memory.find_path
         del creep.memory.start
+        if creep.memory.role == ROLE_HARVESTER and not creep.memory.dismantle_type:
+            del creep.memory.path_to
+            del creep.memory.path_back
+            creep.memory.status = S_WORK
         return
     # creep.moveTo(creep.memory.start.x, creep.memory.start.y)
     move(creep, creep.memory.find_path, None)
