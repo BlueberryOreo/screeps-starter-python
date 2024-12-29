@@ -107,7 +107,7 @@ def main():
                     # create_creep(ROLE_UPGRADER, spawn, BASE_UPGRADER)
                 
                 if spawn.room.find(FIND_CONSTRUCTION_SITES).length > 0:
-                    if num_creeps[ROLE_BUILDER] < 5:
+                    if num_creeps[ROLE_BUILDER] < 4:
                         cost = count_cost(BUILDER_LEVEL1)
                         if spawn.room.energyAvailable >= cost:
                             create_creep(ROLE_BUILDER, spawn, BUILDER_LEVEL1)
