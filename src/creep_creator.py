@@ -28,7 +28,7 @@ def create_creep(role: str, spawn: StructureSpawn, components: list, memory: dic
     time = str(Game.time)
     total_cost = count_cost(components)
     if total_cost > spawn.room.energyAvailable:
-        logger.info("Not enough energy to create creep: {} > {}.".format(total_cost, spawn.room.energyAvailable))
+        logger.info("Not enough energy to create [{}] creep: {} > {}.".format(role, total_cost, spawn.room.energyAvailable))
         return None
     
     if memory:

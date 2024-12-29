@@ -99,50 +99,51 @@ def main():
                     continue
                 # create_creep(ROLE_HARVESTER, spawn, BASE_HARVESTER)
                 # create_creep(ROLE_HARVESTER, spawn, MEDIUM_HARVESTER2)
-            
-            if Memory.dismantle_type:
-                # If there is anything to dismantle
-                if num_creeps[ROLE_HARVESTER] < 3:
-                    cost = count_cost(DISMANTLER)
-                    if spawn.room.energyAvailable >= cost:
-                        creep_memory = {'dismantle_type': Memory.dismantle_type}
-                        create_creep(ROLE_HARVESTER, spawn, DISMANTLER, creep_memory)
-                        continue
-            
+
             if num_creeps[ROLE_CARRIER] < 3:
                 cost = count_cost(CARRIER)
                 if spawn.room.energyAvailable >= cost:
                     create_creep(ROLE_CARRIER, spawn, CARRIER)
                     continue
+            
+            else:
+                if Memory.dismantle_type:
+                    # If there is anything to dismantle
+                    if num_creeps[ROLE_HARVESTER] < 3:
+                        cost = count_cost(DISMANTLER)
+                        if spawn.room.energyAvailable >= cost:
+                            creep_memory = {'dismantle_type': Memory.dismantle_type}
+                            create_creep(ROLE_HARVESTER, spawn, DISMANTLER, creep_memory)
+                            continue
 
-            if num_creeps[ROLE_UPGRADER] < 3:
-                cost = count_cost(MEDIUM_UPGRADER)
-                if spawn.room.energyAvailable >= cost:
-                    create_creep(ROLE_UPGRADER, spawn, MEDIUM_UPGRADER)
-                    continue
-                # create_creep(ROLE_UPGRADER, spawn, BASE_UPGRADER)
-            
-            if spawn.room.find(FIND_CONSTRUCTION_SITES).length > 0:
-                if num_creeps[ROLE_BUILDER] < 4:
-                    cost = count_cost(MEDIUM_BUILDER)
+                if num_creeps[ROLE_UPGRADER] < 4:
+                    cost = count_cost(MEDIUM_UPGRADER)
                     if spawn.room.energyAvailable >= cost:
-                        create_creep(ROLE_BUILDER, spawn, MEDIUM_BUILDER)
+                        create_creep(ROLE_UPGRADER, spawn, MEDIUM_UPGRADER)
                         continue
-                # create_creep(ROLE_BUILDER, spawn, BASE_BUILDER)
-            
-            if spawn.room.find(FIND_STRUCTURES, {"filter": lambda s: s.hits < s.hitsMax * 0.5}).length > 0:
-                if num_creeps[ROLE_REPAIRER] < 2:
-                    cost = count_cost(MEDIUM_REPAIRER)
-                    if spawn.room.energyAvailable >= cost:
-                        create_creep(ROLE_REPAIRER, spawn, MEDIUM_REPAIRER)
-                        continue
+                    # create_creep(ROLE_UPGRADER, spawn, BASE_UPGRADER)
+                
+                if spawn.room.find(FIND_CONSTRUCTION_SITES).length > 0:
+                    if num_creeps[ROLE_BUILDER] < 4:
+                        cost = count_cost(MEDIUM_BUILDER)
+                        if spawn.room.energyAvailable >= cost:
+                            create_creep(ROLE_BUILDER, spawn, MEDIUM_BUILDER)
+                            continue
+                    # create_creep(ROLE_BUILDER, spawn, BASE_BUILDER)
+                
+                if spawn.room.find(FIND_STRUCTURES, {"filter": lambda s: s.hits < s.hitsMax * 0.5}).length > 0:
+                    if num_creeps[ROLE_REPAIRER] < 2:
+                        cost = count_cost(MEDIUM_REPAIRER)
+                        if spawn.room.energyAvailable >= cost:
+                            create_creep(ROLE_REPAIRER, spawn, MEDIUM_REPAIRER)
+                            continue
                     # create_creep(ROLE_REPAIRER, spawn, BASE_REPAIRER)
                 
-            if num_creeps[ROLE_REPAIRER] < 4:
-                cost = count_cost(MEDIUM_REPAIRER)
-                if spawn.room.energyAvailable >= cost:
-                    create_creep(ROLE_REPAIRER, spawn, MEDIUM_REPAIRER)
-                    continue
-                create_creep(ROLE_REPAIRER, spawn, BASE_REPAIRER)
+            # if num_creeps[ROLE_REPAIRER] < 4:
+            #     cost = count_cost(MEDIUM_REPAIRER)
+            #     if spawn.room.energyAvailable >= cost:
+            #         create_creep(ROLE_REPAIRER, spawn, MEDIUM_REPAIRER)
+            #         continue
+            #     create_creep(ROLE_REPAIRER, spawn, MEDIUM_REPAIRER)
 
 module.exports.loop = main
