@@ -40,29 +40,6 @@ def main():
     # Collect garbage
     collect_garbage()
 
-    # Run each creep
-    for name in Object.keys(Game.creeps):
-        creep = Game.creeps[name]
-        # creep.suicide()
-        # continue
-        if creep.memory.role == ROLE_HARVESTER:
-            run_harvester(creep)
-        elif creep.memory.role == ROLE_UPGRADER:
-            run_upgrader(creep)
-        elif creep.memory.role == ROLE_BUILDER:
-            run_builder(creep)
-        elif creep.memory.role == ROLE_ATTACKER:
-            run_attacker(creep)
-        elif creep.memory.role == ROLE_REPAIRER:
-            run_repairer(creep)
-        elif creep.memory.role == ROLE_CARRIER:
-            run_carrier(creep)
-        else:
-            logger.warning("Unexpected role: {}".format(creep.memory.role))
-            logger.warning("Suicide")
-            creep.suicide()
-            continue
-
     # Run each spawn
     for name in Object.keys(Game.spawns):
         spawn = Game.spawns[name]
@@ -70,9 +47,10 @@ def main():
         for tower in spawn.room.find(FIND_MY_STRUCTURES, {"filter": lambda s: s.structureType == STRUCTURE_TOWER}):
             run_tower(tower)
 
+        num_creeps = count_creeps(spawn)
+
         if not spawn.spawning:
             # Get the number of our creeps in the room.
-            num_creeps = count_creeps(spawn)
 
             # If there are enemies in the room, then create a attacker
             if spawn.room.find(FIND_HOSTILE_CREEPS).length > 0:
@@ -80,7 +58,7 @@ def main():
                     create_creep(ROLE_ATTACKER, spawn, BASE_ATTACKER)
                     continue
             
-            if num_creeps[ROLE_CARRIER] < 1:
+            if num_creeps[ROLE_CARRIER] < 2:
                 cost = count_cost(CARRIER)
                 if spawn.room.energyAvailable >= cost:
                     create_creep(ROLE_CARRIER, spawn, CARRIER)
@@ -99,14 +77,14 @@ def main():
                     continue
                 # create_creep(ROLE_HARVESTER, spawn, BASE_HARVESTER)
                 # create_creep(ROLE_HARVESTER, spawn, MEDIUM_HARVESTER2)
-
-            if num_creeps[ROLE_CARRIER] < 3:
-                cost = count_cost(CARRIER)
-                if spawn.room.energyAvailable >= cost:
-                    create_creep(ROLE_CARRIER, spawn, CARRIER)
-                    continue
-            
             else:
+
+                if num_creeps[ROLE_CARRIER] < 4:
+                    cost = count_cost(CARRIER)
+                    if spawn.room.energyAvailable >= cost:
+                        create_creep(ROLE_CARRIER, spawn, CARRIER)
+                        continue
+            
                 if Memory.dismantle_type:
                     # If there is anything to dismantle
                     if num_creeps[ROLE_HARVESTER] < 3:
@@ -116,7 +94,7 @@ def main():
                             create_creep(ROLE_HARVESTER, spawn, DISMANTLER, creep_memory)
                             continue
 
-                if num_creeps[ROLE_UPGRADER] < 4:
+                if num_creeps[ROLE_UPGRADER] < 6:
                     cost = count_cost(MEDIUM_UPGRADER)
                     if spawn.room.energyAvailable >= cost:
                         create_creep(ROLE_UPGRADER, spawn, MEDIUM_UPGRADER)
@@ -145,5 +123,32 @@ def main():
             #         create_creep(ROLE_REPAIRER, spawn, MEDIUM_REPAIRER)
             #         continue
             #     create_creep(ROLE_REPAIRER, spawn, MEDIUM_REPAIRER)
+    
+        # Run each creep
+    for name in Object.keys(Game.creeps):
+        creep = Game.creeps[name]
+        # creep.suicide()
+        # continue
+        if creep.memory.role == ROLE_HARVESTER:
+            run_harvester(creep)
+        elif creep.memory.role == ROLE_CARRIER:
+            run_carrier(creep)
+        elif creep.memory.role == ROLE_ATTACKER:
+            run_attacker(creep)
+        elif num_creeps[ROLE_HARVESTER] >= 2:
+            if creep.memory.role == ROLE_UPGRADER:
+                run_upgrader(creep)
+            elif creep.memory.role == ROLE_BUILDER:
+                run_builder(creep)
+            elif creep.memory.role == ROLE_REPAIRER:
+                run_repairer(creep)
+            else:
+                logger.warning("Unexpected role: {}".format(creep.memory.role))
+                logger.warning("Suicide")
+                creep.suicide()
+                continue
+        # else:
+        #     if not creep.spawning:
+        #         creep.moveTo(creep.room.controller)
 
 module.exports.loop = main

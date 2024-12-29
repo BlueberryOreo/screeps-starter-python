@@ -49,7 +49,7 @@ def run_harvester(creep: Creep):
         creep.memory.status = S_FINDINGWAY
 
     if creep.memory.status == S_FINDINGWAY:
-        if not creep.memory.path_to or not creep.memory.path_back or not creep.memory.source_id:
+        if (creep.memory.dismantle_type and (not creep.memory.path_to or not creep.memory.path_back)) or not creep.memory.source_id:
             source = None
 
             if creep.memory.dismantle_type:
@@ -58,7 +58,22 @@ def run_harvester(creep: Creep):
                 source = _.sample(sources)
             
             if not creep.memory.dismantle_type or not source:
-                source = _.sample(creep.room.find(FIND_SOURCES))
+                # source = _.sample(creep.room.find(FIND_SOURCES))
+                sources = creep.room.find(FIND_SOURCES)
+                source = None
+                # Find the source which is not used by a current harvester
+                for tmp in sources:
+                    flag = True
+                    for i in range(8):
+                        tmp_x = tmp.pos.x + dx[i]
+                        tmp_y = tmp.pos.y + dy[i]
+                        pos = __new__(RoomPosition(tmp_x, tmp_y, creep.room.name))
+                        item = pos.lookFor(LOOK_CREEPS)
+                        if item.length > 0:
+                            flag = False
+                            break
+                    if flag:
+                        source = tmp
                 if not source:
                     logger.info("[{}] No source found.".format(creep.name))
                     return S_IDEL
@@ -68,39 +83,25 @@ def run_harvester(creep: Creep):
             # spawn = _.sample(creep.room.find(FIND_MY_SPAWNS))
             if creep.memory.dismantle_type:
                 targets = _.filter(creep.room.find(FIND_STRUCTURES), 
-                                #    lambda s: (s.structureType == STRUCTURE_SPAWN or s.structureType == STRUCTURE_CONTAINER) and s.store.getFreeCapacity(RESOURCE_ENERGY) > 0
                                 lambda s: s.structureType == STRUCTURE_CONTAINER and s.store.getFreeCapacity(RESOURCE_ENERGY) > 0
-                                                # or ((s.structureType == STRUCTURE_SPAWN or s.structureType == STRUCTURE_EXTENSION) and s.store.getFreeCapacity(RESOURCE_ENERGY) > 0)
                                 )
             else:
-                # Find the container beside the source.
-                targets = []
+                # Find a container beside the source.
+                target = None
                 for i in range(8):
                     tmp_x = source.pos.x + dx[i]
                     tmp_y = source.pos.y + dy[i]
                     pos = __new__(RoomPosition(tmp_x, tmp_y, creep.room.name))
-                    targets = pos.look()
-                    if targets.length > 0:
-                        flag = True
-                        free_capacity = 0
-                        for target in targets:
-                            if target.type == "creep":
-                                flag = False
-                                break
-                                
-                            if target.type == "structure" and target.structure.structureType == STRUCTURE_CONTAINER:
-                                free_capacity += target.structure.store.getFreeCapacity(RESOURCE_ENERGY)
-                        if free_capacity <= 0:
-                            flag = False
-                        if flag:
+                    targets = pos.lookFor(LOOK_STRUCTURES)
+                    for tmp in targets:
+                        if tmp.structureType == STRUCTURE_CONTAINER:
+                            target = tmp
+                        if target:
                             break
-                target = None
-                for tmp in targets:
-                    if tmp.type == "structure" and tmp.structure.structureType == STRUCTURE_CONTAINER:
-                        target = tmp.structure
-                        break
-                targets = [target]
                 
+                if target:
+                    targets = [target]
+
             if targets.length == 0:
                 logger.info("[{}] No target found.".format(creep.name))
                 creep.memory.role = _.sample([ROLE_BUILDER, ROLE_UPGRADER, ROLE_REPAIRER])
@@ -108,14 +109,20 @@ def run_harvester(creep: Creep):
                 return
 
             target = _.sample(targets)
+            creep.memory.source_id = source.id
+            if creep.memory.dismantle_type:
+                creep.memory.target_id = target.id
+                
+            # if move(creep) != ERR_INVALID_ARGS:
+            #     creep.memory.status = S_MOVE
+            #     del creep.memory.path_to
+            #     del creep.memory.path_back
+            #     return
+            
             if creep.memory.dismantle_type and creep.store.getFreeCapacity() > 0:
                 find_path(creep, target, source)
             else:
                 find_path(creep, source, target)
-
-            creep.memory.source_id = source.id
-            if creep.memory.dismantle_type:
-                creep.memory.target_id = target.id
         
         move_to_start(creep)
 

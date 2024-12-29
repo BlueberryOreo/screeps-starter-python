@@ -16,6 +16,17 @@ __pragma__('noalias', 'update')
 dx = [0, 1, 0, -1, 1, 1, -1, -1]
 dy = [-1, 0, 1, 0, -1, 1, 1, -1]
 
+DIRECTIONS = {
+    0: TOP,
+    1: RIGHT,
+    2: BOTTOM,
+    3: LEFT,
+    4: TOP_RIGHT,
+    5: BOTTOM_RIGHT,
+    6: BOTTOM_LEFT,
+    7: TOP_LEFT
+}
+
 
 def count_creeps(spawn: StructureSpawn, role: str = None):
     """
@@ -46,14 +57,36 @@ def get_source_pos(source: Source):
     return source_pos
 
 def move(creep: Creep, path=None, target=None):
+    if creep.memory.last_pos:
+        last_pos = creep.memory.last_pos
+    else:
+        last_pos = creep.pos
+
     creep.memory.last_pos = creep.pos
+
     if path is not None:
         res = creep.moveByPath(path)
     elif target is not None:
         res = creep.moveTo(target)
     else:
-        logger.warning("[{}] No path or target to move. path: {}, target: {}".format(creep.name, path, target))
-        res = ERR_INVALID_ARGS
+        next_x = 0
+        next_y = 0
+        directions = []
+        for i in range(8):
+            next_x = creep.pos.x + dx[i]
+            next_y = creep.pos.y + dy[i]
+            pos = __new__(RoomPosition(next_x, next_y, creep.room.name))
+            if pos.isEqualTo(last_pos):
+                continue
+            road = pos.lookFor(STRUCTURE_ROAD)[0]
+            if road:
+                directions.append(DIRECTIONS[i])
+        direction = _.sample(directions)
+        if direction:
+            res = creep.move(direction)
+        else:
+            logger.warning("[{}] No path or target to move. path: {}, target: {}. Also no road found.".format(creep.name, path, target))
+            res = ERR_INVALID_ARGS
     return res
 
 def waiting(creep: Creep, last_pos: RoomPosition, waiting_time: int = 100):
@@ -88,7 +121,7 @@ def find_path(creep: Creep, source, target):
         creep.memory.find_path = Room.serializePath(find_path)
         return
     
-    path_to = creep.room.findPath(target.pos, source_pos)
+    path_to = creep.room.findPath(target.pos, source_pos, {'ignoreRoads': True})
     # path_to = creep.room.findPath(source.pos, target.pos)
     start = path_to[path_to.length - 1]
     goal = path_to[0]
@@ -100,8 +133,8 @@ def find_path(creep: Creep, source, target):
         creep.memory.status = S_FINDINGWAY
         return
     path_back = creep.room.findPath(__new__(RoomPosition(start.x, start.y, creep.room.name)),
-                                    __new__(RoomPosition(goal.x, goal.y, creep.room.name)))
-    find_path = creep.room.findPath(creep.pos, __new__(RoomPosition(goal.x, goal.y, creep.room.name)))
+                                    __new__(RoomPosition(goal.x, goal.y, creep.room.name)), {'ignoreRoads': True})
+    find_path = creep.room.findPath(creep.pos, __new__(RoomPosition(goal.x, goal.y, creep.room.name)), {'ignoreRoads': True})
     creep.memory.start = goal
     creep.memory.find_path = Room.serializePath(find_path)
     creep.memory.path_to = Room.serializePath(path_to)

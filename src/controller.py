@@ -52,11 +52,19 @@ def work(creep: Creep):
         # stand_item = creep.room.lookForAt(STRUCTURE_CONTAINER, creep.pos.x, creep.pos.y)
         stand_item = creep.pos.lookFor(LOOK_STRUCTURES)[0]
         if stand_item:
-            if stand_item.structureType == STRUCTURE_CONTAINER or stand_item.structureType == STRUCTURE_STORAGE:
-                creep.drop(RESOURCE_ENERGY)
-        else:
-            if creep.store.getFreeCapacity() <= 0:
-                return S_TRANSFER
+            if stand_item.structureType == STRUCTURE_CONTAINER:
+                if stand_item.store.getFreeCapacity() <= 0:
+                    if creep.store.getFreeCapacity() <= 0:
+                        return S_TRANSFER
+                else:
+                    # logger.info("[{}] Container free: {}, creep store: {}".format(creep.name, stand_item.store.getFreeCapacity(RESOURCE_ENERGY), creep.store.getUsedCapacity()))
+                    if stand_item.store.getFreeCapacity(RESOURCE_ENERGY) >= creep.store.getUsedCapacity():
+                        creep.drop(RESOURCE_ENERGY)
+                    else:
+                        creep.drop(RESOURCE_ENERGY, {"amount": stand_item.store.getFreeCapacity(RESOURCE_ENERGY)})
+            else:
+                if creep.store.getFreeCapacity() <= 0:
+                    return S_TRANSFER
     elif creep.store.getFreeCapacity() <= 0:
         return S_MOVE
     
@@ -190,6 +198,7 @@ def worker_move(creep: Creep, th=0.5):
         del creep.memory.path_back
         del creep.memory.target_id
         return S_IDEL
+    
     res = move(creep, path, None)
     # logger.info("[{}] Moving to {}, res {}.".format(creep.name, target, res))
     if next_status == S_WORK:
@@ -208,6 +217,7 @@ def worker_move(creep: Creep, th=0.5):
         logger.info("[{}] Resetting path.".format(creep.name))
         del creep.memory.path_to
         del creep.memory.path_back
+        del creep.memory.source_id
         return S_FINDINGWAY
     
     return creep.memory.status
