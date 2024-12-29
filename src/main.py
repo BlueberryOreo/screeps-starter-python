@@ -131,8 +131,13 @@ def main():
         if num_creeps[ROLE_HARVESTER] >= 2:
             # Turn back to the original role
             if creep.memory.last_role:
+                del creep.memory.path_to
+                del creep.memory.path_back
+                del creep.memory.source_id
+                del creep.memory.target_id
                 creep.memory.role = creep.memory.last_role
-                creep.memory.status = S_FINDINGWAY
+                del creep.memory.last_role
+                creep.memory.status = S_IDEL
 
         if creep.memory.role == ROLE_HARVESTER:
             run_harvester(creep)
@@ -157,6 +162,10 @@ def main():
             if creep.store.getUsedCapacity(RESOURCE_ENERGY):
                 creep.memory.last_role = creep.memory.role
                 creep.memory.role = ROLE_CARRIER
+                del creep.memory.path_to
+                del creep.memory.path_back
+                del creep.memory.source_id
+                del creep.memory.target_id
                 creep.memory.status = S_FINDINGWAY
 
 module.exports.loop = main

@@ -36,21 +36,21 @@ def run_tower(tower: StructureTower):
         return
     
     damaged_my_structures = tower.room.find(FIND_MY_STRUCTURES, {'filter': lambda s: s.hits / s.hitsMax < 0.025}) # 0.001
-    # damaged_public_structures = tower.room.find(FIND_STRUCTURES, {'filter': lambda s: s.hits < s.hitsMax})
+    damaged_public_structures = tower.room.find(FIND_STRUCTURES, {'filter': lambda s: s.structureType == STRUCTURE_CONTAINER and s.hits / s.hitsMax < 0.025})
     if damaged_my_structures.length > 0:
         target = _.sortBy(damaged_my_structures, lambda s: s.hits / s.hitsMax)[0]
         res = tower.repair(target)
         if res != OK:
             logger.warning("[{}] Failed to repair: {}. Error code: {}.".format(tower, target, res))
         return
-    # elif damaged_public_structures.length > 0:
-    #     target = _.sortBy(damaged_public_structures, lambda s: s.hits / s.hitsMax)[0]
-    #     res = tower.repair(target)
-    #     if res == OK:
-    #         logger.info("[{}] Repairing: {}.".format(tower, target))
-    #     else:
-    #         logger.warning("[{}] Failed to repair: {}. Error code: {}.".format(tower, target, res))
-    #     return
+    elif damaged_public_structures.length > 0:
+        target = _.sortBy(damaged_public_structures, lambda s: s.hits / s.hitsMax)[0]
+        res = tower.repair(target)
+        if res == OK:
+            logger.info("[{}] Repairing: {}.".format(tower, target))
+        else:
+            logger.warning("[{}] Failed to repair: {}. Error code: {}.".format(tower, target, res))
+        return
     
     damaged_creeps = tower.room.find(FIND_MY_CREEPS, {'filter': lambda c: c.hits < c.hitsMax})
     if damaged_creeps.length > 0:
