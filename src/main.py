@@ -91,6 +91,13 @@ def main():
                             creep_memory = {'dismantle_type': Memory.dismantle_type}
                             create_creep(ROLE_HARVESTER, spawn, DISMANTLER, creep_memory)
                             continue
+                
+                if spawn.room.find(FIND_STRUCTURES, {"filter": lambda s: s.hits < s.hitsMax * 0.5}).length > 0:
+                    if num_creeps[ROLE_REPAIRER] < 4:
+                        cost = count_cost(REPAIRER_LEVEL1)
+                        if spawn.room.energyAvailable >= cost:
+                            create_creep(ROLE_REPAIRER, spawn, REPAIRER_LEVEL1)
+                            continue
 
                 if num_creeps[ROLE_UPGRADER] < 8:
                     cost = count_cost(UPGRADER_LEVEL1)
@@ -107,12 +114,6 @@ def main():
                             continue
                     # create_creep(ROLE_BUILDER, spawn, BASE_BUILDER)
                 
-                if spawn.room.find(FIND_STRUCTURES, {"filter": lambda s: s.hits < s.hitsMax * 0.5}).length > 0:
-                    if num_creeps[ROLE_REPAIRER] < 4:
-                        cost = count_cost(REPAIRER_LEVEL1)
-                        if spawn.room.energyAvailable >= cost:
-                            create_creep(ROLE_REPAIRER, spawn, REPAIRER_LEVEL1)
-                            continue
                     # create_creep(ROLE_REPAIRER, spawn, BASE_REPAIRER)
                 
             # if num_creeps[ROLE_REPAIRER] < 4:
