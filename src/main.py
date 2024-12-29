@@ -137,7 +137,7 @@ def main():
                 del creep.memory.target_id
                 creep.memory.role = creep.memory.last_role
                 del creep.memory.last_role
-                creep.memory.status = S_IDEL
+                creep.memory.status = S_FINDINGWAY
 
         if creep.memory.role == ROLE_HARVESTER:
             run_harvester(creep)
