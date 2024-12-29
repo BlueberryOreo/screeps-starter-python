@@ -112,7 +112,7 @@ def run_harvester(creep: Creep):
             creep.memory.source_id = source.id
             if creep.memory.dismantle_type:
                 creep.memory.target_id = target.id
-                
+
             # if move(creep) != ERR_INVALID_ARGS:
             #     creep.memory.status = S_MOVE
             #     del creep.memory.path_to
@@ -151,8 +151,8 @@ def run_harvester(creep: Creep):
                     break
             if not target:
                 logger.info("[{}] No available target found.".format(creep.name))
-                logger.info("[{}] Waiting.".format(creep.name))
-                creep.memory.status = S_TRANSFER
+                # logger.info("[{}] Waiting.".format(creep.name))
+                creep.memory.status = S_WORK
                 return
         creep.memory.status = transfer(creep, target)
 

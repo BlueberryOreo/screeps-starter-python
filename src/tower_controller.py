@@ -35,7 +35,7 @@ def run_tower(tower: StructureTower):
             logger.warning("[{}] Failed to attack: {}. Error code: {}.".format(tower, target, res))
         return
     
-    damaged_my_structures = tower.room.find(FIND_MY_STRUCTURES, {'filter': lambda s: s.hits / s.hitsMax < 0.001})
+    damaged_my_structures = tower.room.find(FIND_MY_STRUCTURES, {'filter': lambda s: s.hits / s.hitsMax < 0.025}) # 0.001
     # damaged_public_structures = tower.room.find(FIND_STRUCTURES, {'filter': lambda s: s.hits < s.hitsMax})
     if damaged_my_structures.length > 0:
         target = _.sortBy(damaged_my_structures, lambda s: s.hits / s.hitsMax)[0]
