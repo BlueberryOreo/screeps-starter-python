@@ -47,7 +47,7 @@ def run_repairer(creep: Creep):
         if not creep.memory.path_to or not creep.memory.path_back:
             # if creep.room.find(FIND_STRUCTURES, {'filter': lambda s: s.structureType == STRUCTURE_CONTAINER and s.store.getUsedCapacity(RESOURCE_ENERGY) > 0.5 * s.store.getCapacity(RESOURCE_ENERGY)}).length > 0:
             source = _.sortBy(creep.room.find(FIND_STRUCTURES, {'filter': lambda s: s.structureType == STRUCTURE_CONTAINER and s.store.getUsedCapacity(RESOURCE_ENERGY) > 0}),
-                              lambda s: s.store.getFreeCapacity(RESOURCE_ENERGY) + creep.pos.getRangeTo(s))[0]
+                              lambda s: s.store.getFreeCapacity(RESOURCE_ENERGY) / s.store.getCapacity(RESOURCE_ENERGY) * 100 + creep.pos.getRangeTo(s))[0]
             # else:
             #     source = _.sample(creep.room.find(FIND_SOURCES))
             target = _.sortBy(creep.room.find(FIND_STRUCTURES, {'filter': lambda s: s.structureType != STRUCTURE_WALL and s.structureType != Memory.dismantle_type}), lambda s: s.hits / s.hitsMax)[0]

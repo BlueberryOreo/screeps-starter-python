@@ -128,26 +128,35 @@ def main():
         creep = Game.creeps[name]
         # creep.suicide()
         # continue
+        if num_creeps[ROLE_HARVESTER] >= 2:
+            # Turn back to the original role
+            if creep.memory.last_role:
+                creep.memory.role = creep.memory.last_role
+                creep.memory.status = S_FINDINGWAY
+
         if creep.memory.role == ROLE_HARVESTER:
             run_harvester(creep)
         elif creep.memory.role == ROLE_CARRIER:
             run_carrier(creep)
         elif creep.memory.role == ROLE_ATTACKER:
             run_attacker(creep)
-        elif num_creeps[ROLE_HARVESTER] >= 2 or creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0:
+        elif creep.memory.role == ROLE_REPAIRER:
+            run_repairer(creep)
+        elif num_creeps[ROLE_HARVESTER] >= 2:
             if creep.memory.role == ROLE_UPGRADER:
                 run_upgrader(creep)
             elif creep.memory.role == ROLE_BUILDER:
                 run_builder(creep)
-            elif creep.memory.role == ROLE_REPAIRER:
-                run_repairer(creep)
             else:
                 logger.warning("Unexpected role: {}".format(creep.memory.role))
                 logger.warning("Suicide")
                 creep.suicide()
                 continue
-        # else:
-        #     if not creep.spawning:
-        #         creep.moveTo(creep.room.controller)
+        else:
+            # If there isn't enough harvester, then all the creep who has energy should become a carrier to transfer there energy to the spawns and extentions
+            if creep.store.getUsedCapacity(RESOURCE_ENERGY):
+                creep.memory.last_role = creep.memory.role
+                creep.memory.role = ROLE_CARRIER
+                creep.memory.status = S_FINDINGWAY
 
 module.exports.loop = main
