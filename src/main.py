@@ -47,7 +47,7 @@ def main():
         for tower in spawn.room.find(FIND_MY_STRUCTURES, {"filter": lambda s: s.structureType == STRUCTURE_TOWER}):
             run_tower(tower)
 
-        num_creeps = count_creeps(spawn)
+        num_creeps = count_creeps(spawn.room)
 
         if not spawn.spawning:
             # Get the number of our creeps in the room.
