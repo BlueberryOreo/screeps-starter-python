@@ -49,7 +49,7 @@ def run_carrier(creep: Creep):
             source = _.sortBy(creep.room.find(FIND_STRUCTURES, {'filter': lambda s: s.structureType == STRUCTURE_CONTAINER and s.store.getUsedCapacity(RESOURCE_ENERGY) > 0}),
                               lambda s: s.store.getFreeCapacity(RESOURCE_ENERGY))[0]
             unfilled_towers = creep.room.find(FIND_MY_STRUCTURES, {'filter': lambda s: s.structureType == STRUCTURE_TOWER and s.store.getFreeCapacity(RESOURCE_ENERGY) > 0})
-            if unfilled_towers.length > 0 and count_creeps(creep.room, ROLE_HARVESTER) > 1:
+            if unfilled_towers.length > 0 and count_creeps(creep.room, ROLE_HARVESTER)[ROLE_HARVESTER] > 1:
                 target = _.sortBy(unfilled_towers, lambda s: s.store.getUsedCapacity(RESOURCE_ENERGY))[0]
             else:
                 target = _.sortBy(creep.room.find(FIND_MY_STRUCTURES, {'filter': lambda s: s.structureType != STRUCTURE_RAMPART and s.structureType != STRUCTURE_CONTROLLER and s.store.getFreeCapacity(RESOURCE_ENERGY) > 0}), lambda s: s.store.getUsedCapacity(RESOURCE_ENERGY) / s.store.getCapacity(RESOURCE_ENERGY) * 100)[0]
@@ -57,6 +57,7 @@ def run_carrier(creep: Creep):
                 logger.info("[{}] No source or target found.".format(creep.name))
                 creep.memory.status = S_IDEL
                 return
+            # logger.info("[{}] Source: {}, Target: {}".format(creep.name, source, target))
             creep.memory.source_id = source.id
             creep.memory.target_id = target.id
             find_path(creep, source, target)

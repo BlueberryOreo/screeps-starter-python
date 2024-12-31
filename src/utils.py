@@ -31,6 +31,13 @@ DIRECTIONS = {
 def count_creeps(room: Room, role: str = None):
     """
         Count the number of creeps in the game.
+        
+        Args:
+            room: Room object.
+            role: Role of the creep.
+            
+        Returns:
+            dict: A dictionary with the role as the key and the number of creeps as the value.
     """
     if role:
         cnt = _.sum(Game.creeps, lambda c: c.pos.roomName == room.name and c.memory.role == role)
