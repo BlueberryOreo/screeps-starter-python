@@ -37,6 +37,14 @@ def main():
     Main game logic loop.
     """
 
+    # Set creep roles
+    harvester = HARVESTER_LEVEL4
+    upgrader = UPGRADER_LEVEL3
+    builder = BUILDER_LEVEL3
+    repairer = REPAIRER_LEVEL3
+    attacker = BASE_ATTACKER
+    carrier = CARRIER_LEVEL1
+
     # Collect garbage
     collect_garbage()
 
@@ -55,13 +63,13 @@ def main():
             # If there are enemies in the room, then create a attacker
             if spawn.room.find(FIND_HOSTILE_CREEPS).length > 0:
                 if num_creeps[ROLE_ATTACKER] < 5 and spawn.room.energyAvailable >= 300:
-                    create_creep(ROLE_ATTACKER, spawn, BASE_ATTACKER)
+                    create_creep(ROLE_ATTACKER, spawn, attacker)
                     continue
             
             if num_creeps[ROLE_CARRIER] < 2:
-                cost = count_cost(BASE_CARRIER)
+                cost = count_cost(carrier)
                 if spawn.room.energyAvailable >= cost:
-                    create_creep(ROLE_CARRIER, spawn, BASE_CARRIER)
+                    create_creep(ROLE_CARRIER, spawn, carrier)
                     continue
 
             if num_creeps[ROLE_HARVESTER] < 1:
@@ -71,16 +79,16 @@ def main():
                     continue
                     
             if num_creeps[ROLE_HARVESTER] < 2:
-                cost = count_cost(HARVESTER_LEVEL3)
+                cost = count_cost(harvester)
                 if spawn.room.energyAvailable >= cost:
-                    create_creep(ROLE_HARVESTER, spawn, HARVESTER_LEVEL3)
+                    create_creep(ROLE_HARVESTER, spawn, harvester)
                     continue
             else:
 
                 if num_creeps[ROLE_CARRIER] < 4:
-                    cost = count_cost(BASE_CARRIER)
+                    cost = count_cost(carrier)
                     if spawn.room.energyAvailable >= cost:
-                        create_creep(ROLE_CARRIER, spawn, BASE_CARRIER)
+                        create_creep(ROLE_CARRIER, spawn, carrier)
                         continue
             
                 if Memory.dismantle_type:
@@ -94,23 +102,23 @@ def main():
                 
                 if spawn.room.find(FIND_STRUCTURES, {"filter": lambda s: s.hits < s.hitsMax * 0.5}).length > 0:
                     if num_creeps[ROLE_REPAIRER] < 4:
-                        cost = count_cost(REPAIRER_LEVEL1)
+                        cost = count_cost(repairer)
                         if spawn.room.energyAvailable >= cost:
-                            create_creep(ROLE_REPAIRER, spawn, REPAIRER_LEVEL1)
+                            create_creep(ROLE_REPAIRER, spawn, repairer)
                             continue
 
                 if num_creeps[ROLE_UPGRADER] < 8:
-                    cost = count_cost(UPGRADER_LEVEL1)
+                    cost = count_cost(upgrader)
                     if spawn.room.energyAvailable >= cost:
-                        create_creep(ROLE_UPGRADER, spawn, UPGRADER_LEVEL1)
+                        create_creep(ROLE_UPGRADER, spawn, upgrader)
                         continue
                     # create_creep(ROLE_UPGRADER, spawn, BASE_UPGRADER)
                 
                 if spawn.room.find(FIND_CONSTRUCTION_SITES).length > 0:
                     if num_creeps[ROLE_BUILDER] < 4:
-                        cost = count_cost(BUILDER_LEVEL1)
+                        cost = count_cost(builder)
                         if spawn.room.energyAvailable >= cost:
-                            create_creep(ROLE_BUILDER, spawn, BUILDER_LEVEL1)
+                            create_creep(ROLE_BUILDER, spawn, builder)
                             continue
                     # create_creep(ROLE_BUILDER, spawn, BASE_BUILDER)
                 
@@ -147,7 +155,7 @@ def main():
             run_attacker(creep)
         elif creep.memory.role == ROLE_REPAIRER:
             run_repairer(creep)
-        elif num_creeps[ROLE_HARVESTER] >= 2:
+        elif num_creeps[ROLE_HARVESTER] >= 2 and num_creeps[ROLE_CARRIER] > 0:
             if creep.memory.role == ROLE_UPGRADER:
                 run_upgrader(creep)
             elif creep.memory.role == ROLE_BUILDER:
@@ -158,14 +166,14 @@ def main():
                 creep.suicide()
                 continue
         else:
-            # If there isn't enough harvester, then all the creep who has energy should become a carrier to transfer there energy to the spawns and extentions
-            if creep.store.getUsedCapacity(RESOURCE_ENERGY):
-                creep.memory.last_role = creep.memory.role
-                creep.memory.role = ROLE_CARRIER
-                del creep.memory.path_to
-                del creep.memory.path_back
-                del creep.memory.source_id
-                del creep.memory.target_id
-                creep.memory.status = S_FINDINGWAY
+            # If there isn't enough harvester or carrier, then all the creep should become a carrier to transfer there energy to the spawns and extentions
+            # if creep.store.getUsedCapacity(RESOURCE_ENERGY):
+            creep.memory.last_role = creep.memory.role
+            creep.memory.role = ROLE_CARRIER
+            del creep.memory.path_to
+            del creep.memory.path_back
+            del creep.memory.source_id
+            del creep.memory.target_id
+            creep.memory.status = S_FINDINGWAY
 
 module.exports.loop = main
