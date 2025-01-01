@@ -85,7 +85,7 @@ def main():
                     continue
             else:
 
-                if num_creeps[ROLE_CARRIER] < 4:
+                if num_creeps[ROLE_CARRIER] < 5:
                     cost = count_cost(carrier)
                     if spawn.room.energyAvailable >= cost:
                         create_creep(ROLE_CARRIER, spawn, carrier)
@@ -101,13 +101,13 @@ def main():
                             continue
                 
                 if spawn.room.find(FIND_STRUCTURES, {"filter": lambda s: s.hits < s.hitsMax * 0.5}).length > 0:
-                    if num_creeps[ROLE_REPAIRER] < 4:
+                    if num_creeps[ROLE_REPAIRER] < 3:
                         cost = count_cost(repairer)
                         if spawn.room.energyAvailable >= cost:
                             create_creep(ROLE_REPAIRER, spawn, repairer)
                             continue
 
-                if num_creeps[ROLE_UPGRADER] < 8:
+                if num_creeps[ROLE_UPGRADER] < 5:
                     cost = count_cost(upgrader)
                     if spawn.room.energyAvailable >= cost:
                         create_creep(ROLE_UPGRADER, spawn, upgrader)
