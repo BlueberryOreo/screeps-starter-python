@@ -31,6 +31,6 @@ def run_link(room: Room):
             res = link_from.transferEnergy(link_to)
             if res == OK:
                 logger.info("Link transfered from ({}, {}) to ({}, {}).".format(from_pos[0], from_pos[1], to_pos[0], to_pos[1]))
-            elif res != ERR_FULL or res != ERR_TIRED:
+            elif res != ERR_FULL and res != ERR_TIRED:
                 logger.warning("Failed to transfer from ({}, {}) to ({}, {}). Error code: {}.".format(from_pos[0], from_pos[1], to_pos[0], to_pos[1], res))
     return
