@@ -13,6 +13,7 @@ from repairer_controller import run_repairer
 from carrier_controller import run_carrier
 
 from tower_controller import run_tower
+from link_controller import run_link
 
 import logger
 from utils import *
@@ -54,6 +55,8 @@ def main():
         
         for tower in spawn.room.find(FIND_MY_STRUCTURES, {"filter": lambda s: s.structureType == STRUCTURE_TOWER}):
             run_tower(tower)
+        
+        run_link(spawn.room)
 
         num_creeps = count_creeps(spawn.room)
 

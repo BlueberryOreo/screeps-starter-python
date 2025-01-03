@@ -27,6 +27,9 @@ DIRECTIONS = {
     7: TOP_LEFT
 }
 
+LINK_LINK = [((5, 10), (38, 38)), ] # [(from, to), ]
+LINK_AT_HOME = (38, 38)
+
 
 def count_creeps(room: Room, role: str = None):
     """

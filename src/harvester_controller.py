@@ -147,7 +147,7 @@ def run_harvester(creep: Creep):
                 tmp_y = creep.pos.y + dy[i]
                 pos = __new__(RoomPosition(tmp_x, tmp_y, creep.room.name))
                 target = pos.lookFor(LOOK_STRUCTURES)[0]
-                if target and target.structureType == STRUCTURE_CONTAINER and target.store.getFreeCapacity(RESOURCE_ENERGY) > 0:
+                if target and (target.structureType == STRUCTURE_CONTAINER or target.structureType == STRUCTURE_LINK) and target.store.getFreeCapacity(RESOURCE_ENERGY) > 0:
                     break
             if not target:
                 logger.info("[{}] No available target found.".format(creep.name))
