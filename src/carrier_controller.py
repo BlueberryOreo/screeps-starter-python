@@ -50,7 +50,7 @@ def run_carrier(creep: Creep):
                                                                                      or s.sturctureType == STRUCTURE_STORAGE 
                                                                                      or (s.structureType == STRUCTURE_LINK and s.pos.isEqualTo(LINK_AT_HOME[0], LINK_AT_HOME[1]))) 
                                                                 and s.store.getUsedCapacity(RESOURCE_ENERGY) > 0}),
-                              lambda s: s.store.getFreeCapacity(RESOURCE_ENERGY) / s.store.getCapacity(RESOURCE_ENERGY))[0]
+                              lambda s: creep.pos.getRangeTo(s.pos) + s.store.getFreeCapacity(RESOURCE_ENERGY) / s.store.getCapacity(RESOURCE_ENERGY))[0]
             unfilled_towers = creep.room.find(FIND_MY_STRUCTURES, {'filter': lambda s: s.structureType == STRUCTURE_TOWER and s.store.getFreeCapacity(RESOURCE_ENERGY) > 0})
             if unfilled_towers.length > 0 and count_creeps(creep.room, ROLE_HARVESTER)[ROLE_HARVESTER] > 1:
                 target = _.sortBy(unfilled_towers, lambda s: s.store.getUsedCapacity(RESOURCE_ENERGY))[0]
