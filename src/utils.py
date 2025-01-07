@@ -99,7 +99,7 @@ def move(creep: Creep, path=None, target=None):
             res = ERR_INVALID_ARGS
     return res
 
-def waiting(creep: Creep, last_pos: RoomPosition, waiting_time: int = 70):
+def waiting(creep: Creep, last_pos: RoomPosition, waiting_time: int = 50):
     # logger.info("[{}] Checking waiting. last_pos: {}, current_pos: {}".format(creep.name, last_pos, creep.pos))
     if not last_pos:
         creep.memory.waiting = 0
