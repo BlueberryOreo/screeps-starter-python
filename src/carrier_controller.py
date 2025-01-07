@@ -58,7 +58,7 @@ def run_carrier(creep: Creep):
                 target = _.sortBy(creep.room.find(FIND_MY_STRUCTURES, {'filter': lambda s: s.structureType != STRUCTURE_RAMPART 
                                                                        and s.structureType != STRUCTURE_CONTROLLER 
                                                                        and s.structureType != STRUCTURE_LINK 
-                                                                       and s.store.getFreeCapacity(RESOURCE_ENERGY) > 0}), lambda s: creep.pos.getRangeTo(s.pos) + s.store.getUsedCapacity(RESOURCE_ENERGY) / s.store.getCapacity(RESOURCE_ENERGY) * 100)[0]
+                                                                       and s.store.getFreeCapacity(RESOURCE_ENERGY) > 0}), lambda s: s.store.getUsedCapacity(RESOURCE_ENERGY) / s.store.getCapacity(RESOURCE_ENERGY) * 100)[0]
             if not source or not target:
                 logger.info("[{}] No source or target found.".format(creep.name))
                 creep.memory.status = S_IDEL
