@@ -50,7 +50,7 @@ def run_repairer(creep: Creep):
                               lambda s: (s.store.getFreeCapacity(RESOURCE_ENERGY) / s.store.getCapacity(RESOURCE_ENERGY)) * 100 + creep.pos.getRangeTo(s))[0]
             # else:
             #     source = _.sample(creep.room.find(FIND_SOURCES))
-            target = _.sortBy(creep.room.find(FIND_STRUCTURES, {'filter': lambda s: s.structureType != STRUCTURE_WALL and s.structureType != Memory.dismantle_type}), lambda s: s.hits / s.hitsMax)[0]
+            target = _.sortBy(creep.room.find(FIND_STRUCTURES, {'filter': lambda s: s.structureType != STRUCTURE_WALL and s.structureType != Memory.dismantle_type and s.id != source.id}), lambda s: s.hits / s.hitsMax)[0]
             # target = _.sample(creep.room.find(FIND_STRUCTURES, {'filter': lambda s: s.structureType != STRUCTURE_WALL and s.structureType != Memory.dismantle_type and s.hits < s.hitsMax}))
             if not target or not source:
                 logger.warning("[{}] Source or target not found: source: {} target: {}".format(creep.name, source, target))
