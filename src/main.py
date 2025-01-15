@@ -40,9 +40,9 @@ def main():
 
     # Set creep roles
     harvester = HARVESTER_LEVEL4
-    upgrader = UPGRADER_LEVEL3
-    builder = BUILDER_LEVEL3
-    repairer = REPAIRER_LEVEL3
+    upgrader = UPGRADER_LEVEL4
+    builder = BUILDER_LEVEL4
+    repairer = REPAIRER_LEVEL4
     attacker = BASE_ATTACKER
     carrier = CARRIER_LEVEL1
 
