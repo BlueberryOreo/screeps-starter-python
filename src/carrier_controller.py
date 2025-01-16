@@ -60,7 +60,6 @@ def run_carrier(creep: Creep):
                                                                        and s.structureType != STRUCTURE_CONTROLLER 
                                                                        and s.structureType != STRUCTURE_LINK 
                                                                        and s.structureType != STRUCTURE_EXTRACTOR
-                                                                       and s.structureType != STRUCTURE_LAB
                                                                        and s.store.getFreeCapacity(RESOURCE_ENERGY) > 0}), lambda s: s.store.getUsedCapacity(RESOURCE_ENERGY) / s.store.getCapacity(RESOURCE_ENERGY) * 100 + random.random())[0]
             if not source or not target:
                 logger.info("[{}] No source or target found.".format(creep.name))
