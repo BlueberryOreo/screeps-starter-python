@@ -110,7 +110,7 @@ def main():
                             create_creep(ROLE_REPAIRER, spawn, repairer)
                             continue
 
-                if num_creeps[ROLE_UPGRADER] < 5:
+                if num_creeps[ROLE_UPGRADER] < 6:
                     cost = count_cost(upgrader)
                     if spawn.room.energyAvailable >= cost:
                         create_creep(ROLE_UPGRADER, spawn, upgrader)
